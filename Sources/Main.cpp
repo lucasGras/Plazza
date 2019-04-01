@@ -5,7 +5,7 @@
 ** main function
 */
 
-#include <iostream>
+#include "Plazza.hpp"
 
 int main(int, const char *[])
 {
