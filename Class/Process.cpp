@@ -7,22 +7,36 @@
 
 #include "Process.hpp"
 
+#include <iostream>
+#include <exception>
+
 namespace plaz::abs {
 
 void Process::run(Procedure p)
 {
-	m_p = fork();
-	if (m_p == 0) {
-		m_exitcode = p();
-		_exit(m_exitcode);
-	} else if (m_p < 0)
-		m_error = true;
+	if (!m_runing) {
+		m_exitcode = -1;
+		m_error = false;
+		m_p = fork();
+		if (m_p == 0) {
+			m_exitcode = p();
+			_exit(m_exitcode);
+		} else if (m_p < 0)
+			m_error = true;
+		else
+			m_runing = true;
+	}
 }
 
-void Process::kill()
+void Process::kill(int code)
 {
-	if (m_p > 0)
-		::kill(m_p, SIGTERM);
+	if (m_runing) {
+		if (m_p > 0) {
+			::kill(m_p, code);
+			m_exitcode = code;
+			m_runing = false;
+		}
+	}
 }
 
 bool Process::hasError() const noexcept
@@ -32,22 +46,33 @@ bool Process::hasError() const noexcept
 
 void Process::wait()
 {
-	if (m_p > 0)
-		waitpid(m_p, &m_exitcode, 0);
+	if (m_runing) {
+		if (m_p > 0)
+			waitpid(m_p, &m_exitcode, 0);
+	}
 }
 
-int Process::getExitCode() const noexcept
+int Process::getExitCode() noexcept
 {
+	if (m_exitcode == -1) {
+		waitpid(m_p, &m_exitcode, WNOHANG);
+		m_runing = m_exitcode == -1;
+	}
 	return m_exitcode;
 }
 
 void Process::exec()
 {
-	m_p = fork();
-	if (m_p == 0) {
+	throw std::logic_error("Not implemented");
+}
 
-	} else if (m_p < 0)
-		m_error = true;
+bool Process::isRunning()
+{
+	if (m_exitcode == -1) {
+		waitpid(m_p, &m_exitcode, WNOHANG);
+		m_runing = m_exitcode == -1;
+	}
+	return m_runing;
 }
 
 }

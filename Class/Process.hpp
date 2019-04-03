@@ -18,6 +18,7 @@ extern "C" {
 
 }
 
+#include <atomic>
 #include <functional>
 
 namespace plaz::abs {
@@ -34,16 +35,17 @@ public:
 	Process &operator=(Process &&) = delete;
 
 	void run(Procedure p);
-	void kill();
+	void kill(int code = SIGTERM);
 	bool hasError() const noexcept;
-	int getExitCode() const noexcept;
+	int getExitCode() noexcept;
 	void exec();
 	void wait();
+	bool isRunning();
 private:
-	pid_t m_p = 0;
-	int m_exitcode = 0;
-	bool m_running = false;
+	pid_t m_p = -1;
 	bool m_error = false;
+	int m_exitcode = -1;
+	bool m_runing = false;
 };
 
 }
