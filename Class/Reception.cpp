@@ -41,15 +41,19 @@ void plaz::Reception::receiveOrders() {
             orders.emplace_back(order);
         }
         this->sendOrders(orders);
-        orders.clear();
+       orders.clear();
     }
 }
 
 void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
     for (auto &order : orders) {
         for (int i = 0; i < order.getAmount(); i++) {
-            if (order.isValid())
-                std::cout << "send " << order.getPizza().type << ", " << order.getPizza().size << std::endl;
+            if (order.isValid()) {
+                auto sended = order.getPizza().pack();
+                std::cout << "send mask : " << sended << std::endl;
+                auto pizzaOrdered = order.getPizza().unpack(sended);
+                std::cout << "receive " << pizzaOrdered.getType() << ", " << pizzaOrdered.getSize() << std::endl;
+            }
         }
     }
 }

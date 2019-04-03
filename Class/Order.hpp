@@ -18,13 +18,13 @@ namespace plaz {
         Order(const std::string &order);
         ~Order() = default;
 
-        const Pizza getPizza();
+        Pizza getPizza();
         bool isValid();
         int getAmount();
 
     private:
         inline bool isValidOrder(const std::string &order);
-        std::pair<plaz::Pizza, int> getPizzaFromOrder(const std::string &order);
+        void setPizzaFromOrder(const std::string &order);
 
     private:
         bool _valid;
