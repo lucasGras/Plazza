@@ -6,7 +6,9 @@
 */
 
 #include "Plazza.hpp"
+#include "Pizza.hpp"
 #include <thread>
+#include <Reception.hpp>
 
 void Lel()
 {
@@ -21,12 +23,8 @@ void Lul()
 
 int main(int, const char *[])
 {
-	std::thread t1(Lul);
-	std::thread t2(Lel);
-	t1.detach();
-	t2.detach();
-	std::cout << "ii" << std::endl;
-//	t1.join();
-//	t2.join();
+	plaz::Reception reception;
+
+    reception.receiveOrders();
 	return 0;
 }

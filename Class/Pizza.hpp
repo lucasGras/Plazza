@@ -40,8 +40,8 @@ enum Ingredients : std::size_t {
 };
 
 struct Pizza {
-	PizzaType t;
-	PizzaSize s;
+	PizzaType type;
+	PizzaSize size;
 };
 
 }
