@@ -31,6 +31,12 @@ static std::vector<std::string> split(const std::string &s, char delim) {
     return result;
 }
 
+plaz::Reception::Reception(const std::string &multiplier, const std::string &cooks, const std::string &kitchen) {
+    this->_multiplier = std::stoi(multiplier);
+    this->_cooksNumber = std::stoi(cooks);
+    this->_kitchenStockTimeout = std::stoi(kitchen);
+}
+
 void plaz::Reception::receiveOrders() {
     std::vector<Order> orders;
 
@@ -46,6 +52,7 @@ void plaz::Reception::receiveOrders() {
 }
 
 void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
+    this->createKitchen();
     for (auto &order : orders) {
         for (int i = 0; i < order.getAmount(); i++) {
             if (order.isValid()) {
@@ -56,4 +63,26 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
             }
         }
     }
+}
+
+void plaz::Reception::createKitchen() {
+    std::function<int(void)> function = [this]() -> int {
+        execl("kitchen", "kitchen", std::to_string(this->_kitchens.size()).c_str());
+    };
+    plaz::abs::Process p;
+
+    p.run(function);
+    this->_kitchens.push_back(p);
+}
+
+int plaz::Reception::getMultiplier() {
+    return this->_multiplier;
+}
+
+int plaz::Reception::getCooksNumber() {
+    return this->_cooksNumber;
+}
+
+int plaz::Reception::getKitchenStockTimeout() {
+    return this->_kitchenStockTimeout;
 }

@@ -29,8 +29,8 @@ public:
 public:
 	Process() = default;
 	~Process() = default;
-	Process(const Process &) = delete;
-	Process(Process &&) = delete;
+	Process(const Process &) = default;
+	Process(Process &&) = default;
 	Process &operator=(const Process &) = delete;
 	Process &operator=(Process &&) = delete;
 

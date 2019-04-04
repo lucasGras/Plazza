@@ -11,16 +11,27 @@
 #include <iostream>
 #include <vector>
 #include <Order.hpp>
+#include "Process.hpp"
 
 namespace plaz {
     class Reception {
     public:
-        Reception() = default;
+        Reception(const std::string &multiplier, const std::string &cooks, const std::string &timeout);
         ~Reception() = default;
 
         void receiveOrders();
         void sendOrders(std::vector<Order>);
         void createKitchen();
+
+        int getMultiplier();
+        int getCooksNumber();
+        int getKitchenStockTimeout();
+
+    private:
+        int _multiplier;
+        int _cooksNumber;
+        int _kitchenStockTimeout;
+        std::vector<plaz::abs::Process> _kitchens;
     };
 }
 

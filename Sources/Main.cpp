@@ -21,10 +21,13 @@ void Lul()
 	std::cout << "lul" << std::endl;
 }
 
-int main(int, const char *[])
+int main(int ac, const char **av)
 {
-	plaz::Reception reception;
+	if (ac == 4) {
+		plaz::Reception reception(av[1], av[2], av[3]);
 
-    reception.receiveOrders();
+		reception.receiveOrders();
+	} else
+		return 84;
 	return 0;
 }
