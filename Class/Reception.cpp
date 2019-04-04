@@ -67,7 +67,7 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
 
 void plaz::Reception::createKitchen() {
     std::function<int(void)> function = [this]() -> int {
-        execl("kitchen", "kitchen", std::to_string(this->_kitchens.size()).c_str());
+        return execl("kitchen", "kitchen", std::to_string(this->_kitchens.size()).c_str());
     };
     plaz::abs::Process p;
 
