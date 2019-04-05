@@ -10,6 +10,9 @@
 
 extern "C" {
 
+#include <limits.h>
+#include <stdlib.h>
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -18,8 +21,14 @@ extern "C" {
 
 }
 
+#include <cstring>
 #include <atomic>
+#include <vector>
+#include <string>
+#include <string_view>
 #include <functional>
+
+#include <iostream>
 
 namespace plaz::abs {
 
@@ -29,8 +38,8 @@ public:
 public:
 	Process() = default;
 	~Process() = default;
-	Process(const Process &) = default;
-	Process(Process &&) = default;
+	Process(const Process &) = delete;
+	Process(Process &&) = delete;
 	Process &operator=(const Process &) = delete;
 	Process &operator=(Process &&) = delete;
 
@@ -38,9 +47,12 @@ public:
 	void kill(int code = SIGTERM);
 	bool hasError() const noexcept;
 	int getExitCode() noexcept;
-	void exec();
 	void wait();
 	bool isRunning();
+	void exec(const std::string_view &path, const std::vector<std::string_view> &args = {}, const std::vector<std::string_view> &env = {});
+	void exec(const char *path, char * const argv[], char * const env[]);
+private:
+	static std::string getAbsolutePath(const std::string_view &relativePath);
 private:
 	pid_t m_p = -1;
 	bool m_error = false;
