@@ -9,7 +9,7 @@
 #define PLAZZA_KITCHENDATA_HPP
 
 struct KitchenData {
-	int avalaibleCooks;
+	int availableCooks;
 
 	int stockDoe;
 	int stockTomato;
