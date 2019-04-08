@@ -11,6 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <Order.hpp>
+#include "DataQueue.hpp"
 #include "Process.hpp"
 
 namespace plaz {
@@ -32,6 +33,7 @@ namespace plaz {
         int _cooksNumber;
         int _kitchenStockTimeout;
         std::vector<plaz::abs::Process> _kitchens;
+        plaz::abs::DataQueue<> _dataqueue;
     };
 }
 

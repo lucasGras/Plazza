@@ -31,7 +31,9 @@ static std::vector<std::string> split(const std::string &s, char delim) {
     return result;
 }
 
-plaz::Reception::Reception(const std::string &multiplier, const std::string &cooks, const std::string &kitchen) {
+plaz::Reception::Reception(const std::string &multiplier, const std::string &cooks, const std::string &kitchen)
+    : _dataqueue("/bigfatcook", O_CREAT | O_WRONLY)
+{
     this->_multiplier = std::stoi(multiplier);
     this->_cooksNumber = std::stoi(cooks);
     this->_kitchenStockTimeout = std::stoi(kitchen);
@@ -57,21 +59,23 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
         for (int i = 0; i < order.getAmount(); i++) {
             if (order.isValid()) {
                 auto sended = order.getPizza().pack();
-                std::cout << "send mask : " << sended << std::endl;
+
+                this->_dataqueue.push(std::to_string(sended));
+                /*
                 auto pizzaOrdered = order.getPizza().unpack(sended);
                 std::cout << "receive " << pizzaOrdered.getType() << ", " << pizzaOrdered.getSize() << std::endl;
+                 */
             }
         }
     }
 }
 
 void plaz::Reception::createKitchen() {
-    auto function = [this]() {
-        return execl("kitchen", "kitchen", std::to_string(this->_kitchens.size()).c_str());
-    };
     plaz::abs::Process p;
+    std::vector<std::string_view> args { std::to_string(this->_kitchens.size()) };
+    std::vector<std::string_view> env;
 
-    p.run(function);
+    p.exec(std::string_view("./kitchen"), args, env);
     this->_kitchens.push_back(std::move(p));
 }
 
