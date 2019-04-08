@@ -22,7 +22,6 @@ extern "C" {
 }
 
 #include <cstring>
-#include <atomic>
 #include <vector>
 #include <string>
 #include <string_view>
@@ -39,7 +38,7 @@ public:
 	Process() = default;
 	~Process() = default;
 	Process(const Process &) = delete;
-	Process(Process &&) = delete;
+	Process(Process &&) = default;
 	Process &operator=(const Process &) = delete;
 	Process &operator=(Process &&) = delete;
 

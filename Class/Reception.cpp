@@ -66,13 +66,13 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
 }
 
 void plaz::Reception::createKitchen() {
-    std::function<int(void)> function = [this]() -> int {
+    auto function = [this]() {
         return execl("kitchen", "kitchen", std::to_string(this->_kitchens.size()).c_str());
     };
     plaz::abs::Process p;
 
     p.run(function);
-    this->_kitchens.push_back(p);
+    this->_kitchens.push_back(std::move(p));
 }
 
 int plaz::Reception::getMultiplier() {

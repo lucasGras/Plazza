@@ -97,9 +97,11 @@ void Process::exec(const char *path, char *const *argv, char *const *env)
 		m_error = false;
 		m_p = fork();
 		if (m_p == 0) {
-			if (execve(path, argv, env) < 0)
-				_exit(0);
+			if (execve(path, argv, env) < 0) {
+				std::cerr << strerror(errno) << std::endl;
 				//TODO(clément): check execve error properly
+				_exit(0);
+			}
 		} else if (m_p < 0) {
 			m_error = true;
 			m_exitcode = 1;

@@ -86,7 +86,7 @@ public:
 		return std::string(buff, s);
 	}
 private:
-	constexpr  static struct mq_attr A = {
+	constexpr static struct mq_attr A = {
 		.mq_flags = 0,
 		.mq_maxmsg = MAX_MSG,
 		.mq_msgsize = MAX_MSG_SIZE,
