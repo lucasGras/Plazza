@@ -76,7 +76,7 @@ void plaz::Reception::createKitchen() {
                                          std::to_string(this->_kitchenStockTimeout), "/bigfatcookSharedData" };
     std::vector<std::string_view> env;
 
-    this->_sharedData.emplace_back("/bigfatcookSharedData", O_CREAT);
+    //this->_sharedData.emplace_back("/bigfatcookSharedData", O_CREAT);
     p.exec(std::string_view("./kitchen"), args, env);
     this->_kitchens.push_back(std::move(p));
 }
