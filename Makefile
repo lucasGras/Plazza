@@ -11,8 +11,8 @@ NAME_KITCHEN	=	kitchen
 
 all:
 	mkdir -p build
-   	cd build && cmake .. && cd -
-   	make -C build && cp build/$(NAME_PLAZZA) . && cp build/$(NAME_KITCHEN) .
+	cd build && cmake .. && cd -
+	make -C build && cp build/$(NAME_PLAZZA) . && cp build/$(NAME_KITCHEN) .
 
 
 $(NAME_PLAZZA):
