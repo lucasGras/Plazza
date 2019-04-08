@@ -13,7 +13,7 @@ file(GLOB_RECURSE COMMONS "Commons/*.cpp")
 file(GLOB_RECURSE SRCS_PLAZZA "Plazza/Sources/*.cpp")
 file(GLOB_RECURSE CLASSES_PLAZZA "Plazza/Classes/*.cpp")
 
-file(GLOB_RECURSE SRCS_KITCHEN "Kitchen/Classes/*.cpp")
+file(GLOB_RECURSE SRCS_KITCHEN "Kitchen/Sources/*.cpp")
 file(GLOB_RECURSE CLASSES_KITCHEN "Kitchen/Sources/Class/*.cpp")
 
 add_executable(plazza ${COMMONS} ${SRCS_PLAZZA} ${CLASSES_PLAZZA})
