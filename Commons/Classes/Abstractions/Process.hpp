@@ -26,7 +26,6 @@ extern "C" {
 #include <string>
 #include <string_view>
 #include <functional>
-
 #include <iostream>
 
 namespace plaz::abs {

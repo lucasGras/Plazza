@@ -5,10 +5,11 @@
 ** main function
 */
 
+#include <thread>
+
 #include "Plazza.hpp"
 #include "Pizza.hpp"
-#include <thread>
-#include <Reception.hpp>
+#include "Reception.hpp"
 
 void Lel()
 {
