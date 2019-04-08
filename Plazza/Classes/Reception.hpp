@@ -10,11 +10,17 @@
 #include <string>
 #include <iostream>
 #include <vector>
-
-#include "Order.hpp"
+#include <Order.hpp>
+#include "Abstractions/DataQueue.hpp"
 #include "Abstractions/Process.hpp"
+#include "Abstractions/SharedData.hpp"
 
 namespace plaz {
+
+    typedef struct shared_data_s {
+
+    } shared_data_t;
+
     class Reception {
     public:
         Reception(const std::string &multiplier, const std::string &cooks, const std::string &timeout);
@@ -33,6 +39,8 @@ namespace plaz {
         int _cooksNumber;
         int _kitchenStockTimeout;
         std::vector<plaz::abs::Process> _kitchens;
+        plaz::abs::DataQueue<> _dataQueue;
+        std::vector<plaz::abs::SharedData<shared_data_t>> _sharedData;
     };
 }
 
