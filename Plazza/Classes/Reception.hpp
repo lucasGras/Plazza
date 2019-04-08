@@ -40,7 +40,6 @@ namespace plaz {
         int _kitchenStockTimeout;
         std::vector<plaz::abs::Process> _kitchens;
         plaz::abs::DataQueue<> _dataQueue;
-        //std::vector<plaz::abs::SharedData<shared_data_t>> _sharedData;
     };
 }
 

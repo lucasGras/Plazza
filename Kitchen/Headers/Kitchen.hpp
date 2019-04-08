@@ -19,9 +19,9 @@ namespace plaz::kitchen {
 		~Kitchen() = default;
 
 		void runQueueListen();
-		//std::map<int, plaz::abs::Process> getCooksProcesses();
+		std::map<int, plaz::abs::Process> *getCooksProcesses();
 	private:
-		//std::map<int, plaz::abs::Process> _cooksProcesses;
+		std::map<int, plaz::abs::Process> *_cooksProcesses;
 	};
 }
 #endif //PLAZZA_KITCHEN_HPP

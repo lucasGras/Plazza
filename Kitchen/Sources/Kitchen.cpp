@@ -25,9 +25,9 @@ int main(int ac, char **av) {
 plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks) : AKitchen(
         kitchenId, maxCooks) {}
 
-/*std::map<int, plaz::abs::Process> plaz::kitchen::Kitchen::getCooksProcesses() {
+std::map<int, plaz::abs::Process> *plaz::kitchen::Kitchen::getCooksProcesses() {
     return this->_cooksProcesses;
-}*/
+}
 
 void plaz::kitchen::Kitchen::runQueueListen() {
     std::thread thread([this]() {
