@@ -24,11 +24,9 @@ void Lul()
 
 int main(int ac, const char **av)
 {
-	if (ac == 4) {
-		plaz::Reception reception(av[1], av[2], av[3]);
-
-		reception.receiveOrders();
-	} else
-		return 84;
+	if (ac != 4)
+		return (84);
+	plaz::Reception reception(av[1], av[2], av[3]);
+	reception.receiveOrders();
 	return 0;
 }
