@@ -7,9 +7,18 @@
 
 #include <iostream>
 #include <thread>
+#include <Kitchen.hpp>
 #include "Kitchen.hpp"
 #include "Abstractions/SharedData.hpp"
 #include "KitchenData.hpp"
+
+plaz::kitchen::Kitchen::Kitchen(int cooksNumber, int multiplier, int kitchenStockTimeout,
+								const std::string &sharedData) {
+	this->_cooksNumber = cooksNumber;
+	this->_multiplier = multiplier;
+	this->_kitchenStockTimeout = kitchenStockTimeout;
+	// SharedData
+}
 
 int main(int ac, char **av) {
 	plaz::abs::SharedData<KitchenData> sharedData("/kitchen01", O_CREAT | O_RDWR);
