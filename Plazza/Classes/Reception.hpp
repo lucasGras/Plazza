@@ -10,8 +10,9 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include "../../Commons/Sources/Class/Order.hpp"
-#include "../../Commons/Sources/Class/Process.hpp"
+
+#include "Order.hpp"
+#include "Abstractions/Process.hpp"
 
 namespace plaz {
     class Reception {

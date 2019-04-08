@@ -5,21 +5,33 @@
 ## Made by developers
 ##
 
-NAME	=	plazza
+NAME_PLAZZA		=	plazza
 
-all: $(NAME)
+NAME_KITCHEN	=	kitchen
 
-$(NAME):
+all:
+	mkdir -p build
+   	cd build && cmake .. && cd -
+   	make -C build && cp build/$(NAME_PLAZZA) . && cp build/$(NAME_KITCHEN) .
+
+
+$(NAME_PLAZZA):
 	mkdir -p build
 	cd build && cmake .. && cd -
-	make -C build && cp build/$(NAME) .
+	make -C build $(NAME_PLAZZA) && cp build/$(NAME_PLAZZA) .
+
+$(NAME_KITCHEN):
+	mkdir -p build
+	cd build && cmake .. && cd -
+	make -C build $(NAME_KITCHEN) && cp build/$(NAME_KITCHEN) .
 
 clean:
 	rm -rf build/*
 
 fclean: clean
-	rm -f $(NAME)
+	rm -f $(NAME_PLAZZA)
+	rm -f $(NAME_KITCHEN)
 
 re: fclean all
 
-.PHONY: all clean fclean re $(NAME)
+.PHONY: all clean fclean re $(NAME_PLAZZA)) $(NAME_KITCHEN)
