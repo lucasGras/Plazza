@@ -24,7 +24,6 @@ class SharedData {
 public:
 	SharedData() = delete;
 	SharedData(const std::string_view &name, int mode)
-		: m_mode(mode)
 	{
 		//TODO(clément): convert WRONLY to O_RDWR, can't shm open in write only
 		if ((mode & O_CREAT) > 0) {
@@ -51,7 +50,6 @@ public:
 		munmap(m_raw, sizeof(T));
 		shm_unlink(m_name.data());
 		close(m_fd);
-
 	}
 
 	SharedData(const SharedData &) = delete;
