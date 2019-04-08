@@ -20,7 +20,7 @@ static inline void rtrim(std::string &s) {
 
 static std::vector<std::string> split(const std::string &s, char delim) {
     std::vector<std::string> result;
-    std::stringstream ss (s);
+    std::stringstream ss(s);
     std::string item;
 
     while (getline(ss, item, delim)) {
@@ -32,8 +32,7 @@ static std::vector<std::string> split(const std::string &s, char delim) {
 }
 
 plaz::Reception::Reception(const std::string &multiplier, const std::string &cooks, const std::string &kitchen)
-    : _dataQueue("/bigfatcookQueue", O_CREAT | O_WRONLY)
-{
+        : _dataQueue("/bigfatcookQueue", O_CREAT | O_WRONLY) {
     this->_multiplier = std::stoi(multiplier);
     this->_cooksNumber = std::stoi(cooks);
     this->_kitchenStockTimeout = std::stoi(kitchen);
@@ -49,7 +48,7 @@ void plaz::Reception::receiveOrders() {
             orders.emplace_back(order);
         }
         this->sendOrders(orders);
-       orders.clear();
+        orders.clear();
     }
 }
 
@@ -72,8 +71,8 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
 
 void plaz::Reception::createKitchen() {
     plaz::abs::Process p;
-    std::vector<std::string_view> args { std::to_string(this->_cooksNumber), std::to_string(this->_multiplier),
-                                         std::to_string(this->_kitchenStockTimeout), "/bigfatcookSharedData" };
+    std::vector<std::string_view> args{std::to_string(this->_cooksNumber), std::to_string(this->_multiplier),
+                                       std::to_string(this->_kitchenStockTimeout), "/bigfatcookSharedData"};
     std::vector<std::string_view> env;
 
     //this->_sharedData.emplace_back("/bigfatcookSharedData", O_CREAT);
