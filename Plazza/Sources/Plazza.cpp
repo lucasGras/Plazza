@@ -6,9 +6,9 @@
 */
 
 #include "Plazza.hpp"
-#include "Pizza.hpp"
+#include "../../Commons/Sources/Class/Pizza.hpp"
 #include <thread>
-#include <Reception.hpp>
+#include "Reception.hpp"
 
 void Lel()
 {

@@ -8,10 +8,10 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 endif()
 
 file(GLOB_RECURSE SRCS "Sources/*.cpp")
-file(GLOB_RECURSE CLASSES "Class/*.cpp")
+file(GLOB_RECURSE CLASSES "Plazza/Sources/Class/*.cpp")
 
 add_executable(plazza ${SRCS} ${CLASSES})
-target_include_directories(plazza PRIVATE Headers Class)
+target_include_directories(plazza PRIVATE Plazza/Headers Plazza/Sources/Class)
 target_link_libraries(plazza PRIVATE pthread rt)
 target_compile_options(plazza PRIVATE ${FLAG})
 set_target_properties(plazza PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
