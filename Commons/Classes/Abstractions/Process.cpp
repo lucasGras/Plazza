@@ -75,7 +75,7 @@ void Process::exec(const std::string_view &path, const std::vector<std::string_v
 
 	_args[0] = const_cast<char *>(path.data());
 	for (std::size_t i = 1; i < args.size() + 1; i++)
-		_args[i] = const_cast<char *>(args[i].data());
+		_args[i] = const_cast<char *>(args[i - 1].data());
 	for (std::size_t i = 0; i < env.size(); i++)
 		_env[i] = const_cast<char *>(env[i].data());
 
@@ -99,7 +99,7 @@ void Process::exec(const char *path, char *const *argv, char *const *env)
 		m_p = fork();
 		if (m_p == 0) {
 			if (execve(path, argv, env) < 0) {
-				std::cerr << strerror(errno) << std::endl;
+				std::cerr << "execve: " << strerror(errno) << std::endl;
 				//TODO(clément): check execve error properly
 				_exit(0);
 			}

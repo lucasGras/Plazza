@@ -13,10 +13,11 @@ extern "C" {
 	#include <sys/mman.h>
 	#include <fcntl.h>
 	#include <unistd.h>
-};
+}
 
 #include <string_view>
 #include <cstring>
+#include <iostream>
 
 namespace plaz::abs {
 
@@ -27,17 +28,32 @@ public:
 	SharedData(const std::string_view &name, int mode)
 		: m_name(name)
 	{
+		init(mode);
+	}
 
+	SharedData(const std::string_view &name, int mode, const T &obj)
+		: m_name(name)
+	{
+		init(mode);
+		*m_typed = obj;
+	}
+
+	SharedData(const std::string_view &name, int mode, T &&obj)
+		: m_name(name)
+	{
+		init(mode);
+		*m_typed = obj;
 	}
 
 	~SharedData()
 	{
-		munmap(m_raw, sizeof(T));
-		std::cerr << strerror(errno) << std::endl;
-		shm_unlink(m_name.data());
-		std::cerr << strerror(errno) << std::endl;
-		close(m_fd);
-		std::cerr << strerror(errno) << std::endl;
+		if (munmap(m_raw, sizeof(T)) < 0)
+			std::cerr << getpid() << " -> munmap: " << strerror(errno) << std::endl;
+		if (canUnlink())
+			if (shm_unlink(m_name.data()) < 0)
+				std::cerr << getpid() << " -> shm_unlink: " << strerror(errno) << std::endl;
+		if (close(m_fd) < 0)
+			std::cerr << getpid() << " -> close: " << strerror(errno) << std::endl;
 	}
 
 	SharedData(const SharedData &) = delete;
@@ -77,6 +93,7 @@ public:
 		*m_typed = obj;
 		return *this;
 	}
+
 private:
 	void init(int mode)
 	{
@@ -97,6 +114,16 @@ private:
 			else
 				m_raw = mmap(NULL, sizeof(T), PROT_READ, MAP_SHARED, m_fd, 0);
 		}
+	}
+
+	bool canUnlink() const
+	{
+		if (fcntl(m_fd, F_SETLEASE, F_WRLCK) < 0 && errno == EAGAIN)
+			return true;
+
+		fcntl(m_fd, F_SETLEASE, F_UNLCK);
+
+		return false;
 	}
 private:
 	union {
