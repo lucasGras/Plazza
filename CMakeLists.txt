@@ -10,7 +10,6 @@ endif()
 FILE(GLOB_RECURSE COMMONS "Commons/*.cpp")
 SET(COMMON_HEADERS
         "Commons/Classes"
-        "Commons/Enums"
         "Commons/Structures")
 
 FILE(GLOB_RECURSE SRCS_PLAZZA "Plazza/Sources/*.cpp")

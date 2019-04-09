@@ -8,9 +8,11 @@
 #define PLAZZA_RECEPTION_HPP
 
 #include <string>
+#include <map>
 #include <iostream>
 #include <vector>
 #include <Order.hpp>
+#include <AKitchen.hpp>
 #include "Abstractions/DataQueue.hpp"
 #include "Abstractions/Process.hpp"
 #include "Abstractions/SharedData.hpp"
@@ -24,18 +26,18 @@ namespace plaz {
 
         void receiveOrders();
         void sendOrders(std::vector<Order>);
-        void createKitchen();
+        plaz::AKitchen *getAvailableKitchen(plaz::Pizza);
+        plaz::AKitchen *initNewKitchen();
 
         int getMultiplier();
-        int getCooksNumber();
+        int getMaxCooksNumber();
         int getKitchenStockTimeout();
 
     private:
         int _multiplier;
         int _cooksNumber;
         int _kitchenStockTimeout;
-        std::vector<plaz::abs::Process> _kitchens;
-        plaz::abs::DataQueue<> _dataQueue;
+        std::map<plaz::AKitchen*, plaz::abs::Process*> _kitchens;
     };
 }
 

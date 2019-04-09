@@ -14,21 +14,12 @@
 #include "Reception.hpp"
 #include "Abstractions/SharedData.hpp"
 
-void Lel() {
-    std::cout << "lel" << std::endl;
-}
-
-void Lul() {
-    std::this_thread::yield();
-    std::cout << "lul" << std::endl;
-}
-
 int main(int ac, const char **av) {
     if (ac != 4)
         return (84);
-    plaz::AKitchen kitchen(1, 3);
-    kitchen.getQueue()->push("tamerelapute");
-
+    plaz::Reception reception(av[1], av[2], av[3]);
+    reception.receiveOrders();
+    return (0);
     //std::cout << "Avaiable Cooks: " << kitchen.getData()->operator*().availableCooks << std::endl;
 
     /*plaz::abs::SharedData<KitchenData> sharedData("/kitchen01", O_CREAT | O_RDWR);
@@ -36,7 +27,6 @@ int main(int ac, const char **av) {
         std::cout << "Avaiable Cooks: " << sharedData->avalaibleCooks << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(2));
     }*/
-    /*plaz::Reception reception(av[1], av[2], av[3]);
-    reception.receiveOrders();
+    /*
     return 0;*/
 }

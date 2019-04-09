@@ -31,8 +31,7 @@ static std::vector<std::string> split(const std::string &s, char delim) {
     return result;
 }
 
-plaz::Reception::Reception(const std::string &multiplier, const std::string &cooks, const std::string &kitchen)
-        : _dataQueue("/bigfatcookQueue", O_CREAT | O_WRONLY) {
+plaz::Reception::Reception(const std::string &multiplier, const std::string &cooks, const std::string &kitchen) {
     this->_multiplier = std::stoi(multiplier);
     this->_cooksNumber = std::stoi(cooks);
     this->_kitchenStockTimeout = std::stoi(kitchen);
@@ -53,38 +52,47 @@ void plaz::Reception::receiveOrders() {
 }
 
 void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
-    this->createKitchen();
     for (auto &order : orders) {
         for (int i = 0; i < order.getAmount(); i++) {
-            if (order.isValid()) {
-                auto sended = order.getPizza().pack();
-
-                this->_dataQueue.push(std::to_string(sended));
-                /*
-                auto pizzaOrdered = order.getPizza().unpack(sended);
-                std::cout << "receive " << pizzaOrdered.getType() << ", " << pizzaOrdered.getSize() << std::endl;
-                 */
-            }
+            if (!order.isValid())
+                continue;
+            auto sended = order.getPizza().pack();
+            auto kitchen = getAvailableKitchen(order.getPizza());
+            std::cout << "[RECEPTION] Send pizza in kitchen (" << kitchen->getKitchenId() << ")" << std::endl;
+            //(*kitchen->getData())->availableCooks--;
+            kitchen->getQueue()->push(std::to_string(sended));
         }
     }
 }
 
-void plaz::Reception::createKitchen() {
-    plaz::abs::Process p;
-    std::vector<std::string_view> args{std::to_string(this->_cooksNumber), std::to_string(this->_multiplier),
-                                       std::to_string(this->_kitchenStockTimeout), "/bigfatcookSharedData"};
+plaz::AKitchen *plaz::Reception::getAvailableKitchen(plaz::Pizza pizza) {
+    for (auto &[kitchen, process] : this->_kitchens) {
+        if ((*kitchen->getData())->availableCooks <= 0)
+            continue;
+        if (pizza.checkCanConsumePizza(kitchen->getData()))
+            return kitchen;
+    }
+    return this->initNewKitchen();
+}
+
+plaz::AKitchen *plaz::Reception::initNewKitchen() {
+    auto *kitchen = new plaz::AKitchen(this->_kitchens.size() + 1, this->_cooksNumber, this->_kitchenStockTimeout, this->_multiplier);
+    auto *process = new plaz::abs::Process();
+    std::vector<std::string_view> args{std::to_string(kitchen->getKitchenId()), std::to_string(this->_cooksNumber), std::to_string(this->_kitchenStockTimeout), std::to_string(this->_multiplier)};
     std::vector<std::string_view> env;
 
-    //this->_sharedData.emplace_back("/bigfatcookSharedData", O_CREAT);
-    p.exec(std::string_view("./kitchen"), args, env);
-    this->_kitchens.push_back(std::move(p));
+    (*kitchen->getData())->availableCooks = this->getMaxCooksNumber();
+    this->_kitchens.emplace(kitchen, process);
+    std::cout << "[RECEPTION] Create new kitchen (" << kitchen->getKitchenId() << ")" << std::endl;
+    process->exec(std::string_view("./kitchen"), args, env);
+    return (kitchen);
 }
 
 int plaz::Reception::getMultiplier() {
     return this->_multiplier;
 }
 
-int plaz::Reception::getCooksNumber() {
+int plaz::Reception::getMaxCooksNumber() {
     return this->_cooksNumber;
 }
 

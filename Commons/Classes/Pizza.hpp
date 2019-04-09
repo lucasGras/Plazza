@@ -13,38 +13,15 @@
 #include <algorithm>
 #include <vector>
 #include <iostream>
+#include <functional>
+#include <Abstractions/SharedData.hpp>
+#include "PizzaManager.hpp"
+#include "KitchenData.hpp"
 
 #define BINARY_OFFSET_SIZE 5
 #define BINARY_OFFSET_TYPE 32
 
 namespace plaz {
-
-    enum PizzaType {
-        Regina = 1 << 0,
-        Margarita = 1 << 1,
-        Americana = 1 << 2,
-        Fantasia = 1 << 3,
-    };
-
-    enum PizzaSize {
-        S = 1 << 0,
-        M = 1 << 1,
-        L = 1 << 2,
-        XL = 1 << 3,
-        XXL = 1 << 4,
-    };
-
-    enum Ingredients : std::size_t {
-        Doe,
-        Tomota,
-        Gruyere,
-        Ham,
-        Mushrooms,
-        Steak,
-        Eggplant,
-        GoatCheese,
-        ChiefLove,
-    };
 
     typedef int BitMask;
 
@@ -59,6 +36,8 @@ namespace plaz {
         plaz::Pizza unpack(BitMask bitmask);
         PizzaType getType();
         PizzaSize getSize();
+        void consumePizza(plaz::abs::SharedData<KitchenData> *data);
+        bool checkCanConsumePizza(plaz::abs::SharedData<KitchenData> *data);
 
     private:
         PizzaType _type;

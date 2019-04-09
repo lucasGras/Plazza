@@ -12,10 +12,8 @@ plaz::Pizza::Pizza(std::string type, std::string size) {
     std::vector<std::string> typeVector = {"regina", "margarita", "americana", "fantasia"};
     std::vector<std::string> sizeVector = {"S", "M", "L", "XL", "XXL"};
 
-    this->_type = static_cast<PizzaType>(1 << std::distance(typeVector.begin(),
-                                                            std::find(typeVector.begin(), typeVector.end(), type)));
-    this->_size = static_cast<PizzaSize>(1 << std::distance(sizeVector.begin(),
-                                                            std::find(sizeVector.begin(), sizeVector.end(), size)));
+    this->_type = static_cast<PizzaType>(1 << std::distance(typeVector.begin(), std::find(typeVector.begin(), typeVector.end(), type)));
+    this->_size = static_cast<PizzaSize>(1 << std::distance(sizeVector.begin(), std::find(sizeVector.begin(), sizeVector.end(), size)));
 }
 
 /**
@@ -51,4 +49,62 @@ plaz::PizzaType plaz::Pizza::getType() {
 
 plaz::PizzaSize plaz::Pizza::getSize() {
     return this->_size;
+}
+
+void plaz::Pizza::consumePizza(plaz::abs::SharedData<KitchenData> *data) {
+    std::vector<Ingredients> listIngredients = PizzaManager().getIngredientsOf(this->getType());
+    for (auto const &ingredient: listIngredients) {
+        switch (ingredient) {
+            case Doe:
+                (*data)->stockDoe -= 1;
+                break;
+            case Tomato:
+                (*data)->stockTomato -= 1;
+                break;
+            case Gruyere:
+                (*data)->stockGruyere -= 1;
+                break;
+            case Ham:
+                (*data)->stockHam -= 1;
+                break;
+            case Mushrooms:
+                (*data)->stockMushrooms -= 1;
+                break;
+            case Steak:
+                (*data)->stockSteak -= 1;
+                break;
+            case Eggplant:
+                (*data)->stockEggPlant -= 1;
+                break;
+            case GoatCheese:
+                (*data)->stockGoatCheese -= 1;
+                break;
+            case ChiefLove:
+                (*data)->stockChiefLove -= 1;
+                break;
+        }
+    }
+}
+
+
+bool plaz::Pizza::checkCanConsumePizza(plaz::abs::SharedData<KitchenData> *data) {
+    std::vector<Ingredients> listIngredients = PizzaManager().getIngredientsOf(this->getType());
+    std::map<Ingredients, int> actualStock = {
+            { Doe, (*data)->stockDoe },
+            { Tomato, (*data)->stockTomato },
+            { Gruyere, (*data)->stockGruyere },
+            { Ham, (*data)->stockHam },
+            { Mushrooms, (*data)->stockMushrooms },
+            { Steak, (*data)->stockSteak},
+            { Eggplant, (*data)->stockEggPlant},
+            { GoatCheese, (*data)->stockGoatCheese },
+            { ChiefLove, (*data)->stockChiefLove}
+    };
+    for (auto const &ingredient: listIngredients) {
+        if (!actualStock.count(ingredient))
+            return false;
+        if (actualStock[ingredient] <= 0)
+            return false;
+    }
+    return true;
 }

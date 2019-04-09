@@ -15,7 +15,7 @@
 namespace plaz::kitchen {
 	class Kitchen : public AKitchen {
 	public:
-		Kitchen(int kitchenId, int maxCooks);
+		Kitchen(int kitchenId, int maxCooks, int timeout, int multiplier);
 		~Kitchen() = default;
 
 		void runQueueListen();

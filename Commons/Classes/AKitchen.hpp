@@ -16,7 +16,7 @@
 namespace plaz {
 	class AKitchen {
 	public:
-		AKitchen(int kitchenId, int maxCooks);
+		AKitchen(int kitchenId, int maxCooks, int timeout, int multiplier);
 		~AKitchen() = default;
 
 		int getKitchenId() const;
@@ -26,6 +26,8 @@ namespace plaz {
 	private:
 		int _kitchenId;
 		int _maxCooks;
+		int _timeout;
+		int _multiplier;
 		plaz::abs::SharedData<KitchenData> *_sharedData;
         plaz::abs::DataQueue<> *_queue;
 	};
