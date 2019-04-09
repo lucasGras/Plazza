@@ -9,7 +9,7 @@
 #include <thread>
 #include "Kitchen.hpp"
 #include "Abstractions/DataQueue.hpp"
-#include "KitchenData.hpp"
+#include "../../Commons/Structures/KitchenData.hpp"
 
 int main(int ac, char **av) {
     if (ac != 3)

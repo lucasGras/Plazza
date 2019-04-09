@@ -11,7 +11,7 @@
 #include <string>
 #include "Abstractions/SharedData.hpp"
 #include "Abstractions/DataQueue.hpp"
-#include "KitchenData.hpp"
+#include "../Structures/KitchenData.hpp"
 
 namespace plaz {
 	class AKitchen {

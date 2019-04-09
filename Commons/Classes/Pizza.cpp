@@ -13,9 +13,9 @@ plaz::Pizza::Pizza(std::string type, std::string size) {
     std::vector<std::string> sizeVector = {"S", "M", "L", "XL", "XXL"};
 
     this->_type = static_cast<PizzaType>(1 << std::distance(typeVector.begin(),
-            std::find(typeVector.begin(), typeVector.end(), type)));
+                                                            std::find(typeVector.begin(), typeVector.end(), type)));
     this->_size = static_cast<PizzaSize>(1 << std::distance(sizeVector.begin(),
-            std::find(sizeVector.begin(), sizeVector.end(), size)));
+                                                            std::find(sizeVector.begin(), sizeVector.end(), size)));
 }
 
 /**
@@ -27,8 +27,8 @@ plaz::Pizza::Pizza(std::string type, std::string size) {
 plaz::BitMask plaz::Pizza::pack() {
     BitMask mask = 0;
 
-    mask |= (BitMask)this->_type << BINARY_OFFSET_SIZE;
-    mask |= (BitMask)this->_size;
+    mask |= (BitMask) this->_type << BINARY_OFFSET_SIZE;
+    mask |= (BitMask) this->_size;
     return mask;
 }
 

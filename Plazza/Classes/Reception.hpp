@@ -17,10 +17,6 @@
 
 namespace plaz {
 
-    typedef struct shared_data_s {
-
-    } shared_data_t;
-
     class Reception {
     public:
         Reception(const std::string &multiplier, const std::string &cooks, const std::string &timeout);
