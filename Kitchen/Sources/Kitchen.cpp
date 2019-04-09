@@ -12,11 +12,11 @@
 #include "KitchenData.hpp"
 
 int main(int ac, char **av) {
-    if (ac != 4)
+    if (ac != 5)
         return (84);
     // ARGS: ID - MaxCooks - TimeOut - Multiplier
-    std::cout << "[KITCHEN] Create kitchen " << std::atoi(av[0]) << std::endl;
-    plaz::kitchen::Kitchen kitchen(std::atoi(av[0]), std::atoi(av[1]), std::atoi(av[2]), std::atoi(av[3]));
+    std::cout << "[KITCHEN] Create kitchen " << std::atoi(av[1]) << std::endl;
+    plaz::kitchen::Kitchen kitchen(std::atoi(av[1]), std::atoi(av[2]), std::atoi(av[3]), std::atoi(av[4]));
     kitchen.runQueueListen();
     while (true);
     /*while (true) {
