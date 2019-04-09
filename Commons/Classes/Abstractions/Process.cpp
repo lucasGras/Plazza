@@ -67,13 +67,14 @@ int Process::getExitCode() noexcept
 
 void Process::exec(const std::string_view &path, const std::vector<std::string_view> &args, const std::vector<std::string_view> &env)
 {
-	char * _args[args.size() + 1];
+	char * _args[args.size() + 2];
 	char *_env[env.size() + 1];
 
-	_args[args.size()] = NULL;
+	_args[args.size() + 1] = NULL;
 	_env[env.size()] = NULL;
 
-	for (std::size_t i = 0; i < args.size(); i++)
+	_args[0] = const_cast<char *>(path.data());
+	for (std::size_t i = 1; i < args.size() + 1; i++)
 		_args[i] = const_cast<char *>(args[i].data());
 	for (std::size_t i = 0; i < env.size(); i++)
 		_env[i] = const_cast<char *>(env[i].data());
