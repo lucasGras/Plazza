@@ -16,7 +16,7 @@ int main(int ac, char **av) {
         return (84);
     plaz::kitchen::Kitchen kitchen(std::atoi(av[1]), std::atoi(av[2]));
     kitchen.runQueueListen();
-    while (1) {
+    while (true) {
         std::cout << "Available cooks: " << (*kitchen.getData())->availableCooks << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(2));
     }
