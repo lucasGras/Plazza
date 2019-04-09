@@ -16,6 +16,7 @@ extern "C" {
 };
 
 #include <string_view>
+#include <cstring>
 
 namespace plaz::abs {
 
@@ -24,32 +25,19 @@ class SharedData {
 public:
 	SharedData() = delete;
 	SharedData(const std::string_view &name, int mode)
+		: m_name(name)
 	{
-		//TODO(clément): convert WRONLY to O_RDWR, can't shm open in write only
-		if ((mode & O_CREAT) > 0) {
 
-			//TODO(clément): check for fail of shm open and mmap
-			m_fd = shm_open(name.data(), mode, PERM);
-			ftruncate(m_fd, sizeof(T));
-			if ((mode & O_WRONLY) > 0 || (mode & O_RDWR) > 0)
-				m_raw = mmap(NULL, sizeof(T), PROT_WRITE | PROT_READ, MAP_SHARED, m_fd, 0);
-			else
-				m_raw = mmap(NULL, sizeof(T), PROT_READ, MAP_SHARED, m_fd, 0);
-			//TODO(clément): do something about this
-		} else {
-			m_fd = shm_open(name.data(), mode, PERM);
-			if ((mode & O_WRONLY) > 0 || (mode & O_RDWR) > 0)
-				m_raw = mmap(NULL, sizeof(T), PROT_WRITE | PROT_READ, MAP_SHARED, m_fd, 0);
-			else
-				m_raw = mmap(NULL, sizeof(T), PROT_READ, MAP_SHARED, m_fd, 0);
-		}
 	}
 
 	~SharedData()
 	{
 		munmap(m_raw, sizeof(T));
+		std::cerr << strerror(errno) << std::endl;
 		shm_unlink(m_name.data());
+		std::cerr << strerror(errno) << std::endl;
 		close(m_fd);
+		std::cerr << strerror(errno) << std::endl;
 	}
 
 	SharedData(const SharedData &) = delete;
@@ -88,6 +76,27 @@ public:
 	{
 		*m_typed = obj;
 		return *this;
+	}
+private:
+	void init(int mode)
+	{
+		//TODO(clément): convert WRONLY to O_RDWR, can't shm open in write only
+		if ((mode & O_CREAT) > 0) {
+		//TODO(clément): check for fail of shm open and mmap
+			m_fd = shm_open(m_name.data(), mode, PERM);
+			ftruncate(m_fd, sizeof(T));
+			if ((mode & O_WRONLY) > 0 || (mode & O_RDWR) > 0)
+				m_raw = mmap(NULL, sizeof(T), PROT_WRITE | PROT_READ, MAP_SHARED, m_fd, 0);
+			else
+				m_raw = mmap(NULL, sizeof(T), PROT_READ, MAP_SHARED, m_fd, 0);
+			//TODO(clément): do something about this
+		} else {
+			m_fd = shm_open(m_name.data(), mode, PERM);
+			if ((mode & O_WRONLY) > 0 || (mode & O_RDWR) > 0)
+				m_raw = mmap(NULL, sizeof(T), PROT_WRITE | PROT_READ, MAP_SHARED, m_fd, 0);
+			else
+				m_raw = mmap(NULL, sizeof(T), PROT_READ, MAP_SHARED, m_fd, 0);
+		}
 	}
 private:
 	union {
