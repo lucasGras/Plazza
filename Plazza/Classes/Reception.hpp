@@ -26,6 +26,8 @@ namespace plaz {
 
         void receiveOrders();
         void sendOrders(std::vector<Order>);
+        void status();
+        void quit();
         plaz::AKitchen *getAvailableKitchen(plaz::Pizza);
         plaz::AKitchen *initNewKitchen();
 

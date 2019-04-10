@@ -17,6 +17,7 @@ int main(int ac, char **av) {
     // ARGS: ID - MaxCooks - TimeOut - Multiplier
     std::cout << "[KITCHEN] Create kitchen " << std::atoi(av[1]) << std::endl;
     plaz::kitchen::Kitchen kitchen(std::atoi(av[1]), std::atoi(av[2]), std::atoi(av[3]), std::atoi(av[4]));
+
     kitchen.runQueueListen();
     while (true);
     /*while (true) {
@@ -25,8 +26,10 @@ int main(int ac, char **av) {
     }*/
 }
 
-plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int multiplier) : AKitchen(
-        kitchenId, maxCooks, timeout, multiplier) {
+plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int multiplier)
+    : AKitchen(kitchenId, maxCooks, timeout, multiplier)
+{
+    this->initKitchenStock();
 /*    for (int cook = 0; cook < maxCooks; cook++) {
         this->_cooksProcesses->emplace(cook, plaz::abs::Process());
         (*this->_cooksProcesses)[cook].run([this]() -> int {
@@ -49,4 +52,16 @@ void plaz::kitchen::Kitchen::runQueueListen() {
         }
     });
     thread.detach();
+}
+
+void plaz::kitchen::Kitchen::initKitchenStock() {
+    (*this->getData())->stockDoe = 5;
+    (*this->getData())->stockChiefLove = 5;
+    (*this->getData())->stockGoatCheese = 5;
+    (*this->getData())->stockEggPlant = 5;
+    (*this->getData())->stockSteak = 5;
+    (*this->getData())->stockMushrooms = 5;
+    (*this->getData())->stockHam = 5;
+    (*this->getData())->stockGruyere = 5;
+    (*this->getData())->stockTomato = 5;
 }

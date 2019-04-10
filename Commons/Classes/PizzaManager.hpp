@@ -48,7 +48,7 @@ namespace plaz {
         inline std::vector<Ingredients> getIngredientsOf(PizzaType pizza) {
             return _ingredientsOfPizza[pizza];
         }
-        inline int getTimeOfCuisson(PizzaType pizzaType) {
+        inline int getTimeOfCooking(PizzaType pizzaType) {
             return _timesOfPizza[pizzaType];
         }
     private:

@@ -11,15 +11,15 @@
 struct KitchenData {
     int availableCooks;
 
-    int stockDoe;
-    int stockTomato;
-    int stockGruyere;
-    int stockSteak;
-    int stockMushrooms;
-    int stockHam;
-    int stockEggPlant;
-    int stockGoatCheese;
-    int stockChiefLove;
+    int stockDoe = 5;
+    int stockTomato = 5;
+    int stockGruyere = 5;
+    int stockSteak = 5;
+    int stockMushrooms = 5;
+    int stockHam = 5;
+    int stockEggPlant = 5;
+    int stockGoatCheese = 5;
+    int stockChiefLove = 5;
 };
 
 #endif //PLAZZA_KITCHENDATA_HPP

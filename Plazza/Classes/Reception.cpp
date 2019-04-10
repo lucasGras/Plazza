@@ -43,6 +43,12 @@ void plaz::Reception::receiveOrders() {
     for (std::string line; std::getline(std::cin, line);) {
         auto vector = split(line, ';');
 
+        if (line == "status") {
+            this->status();
+            continue;
+        }
+        if (line == "exit")
+            this->quit();
         for (const auto &order : vector) {
             orders.emplace_back(order);
         }
@@ -98,4 +104,31 @@ int plaz::Reception::getMaxCooksNumber() {
 
 int plaz::Reception::getKitchenStockTimeout() {
     return this->_kitchenStockTimeout;
+}
+
+void plaz::Reception::status() {
+    for (auto &[kitchen, process] : this->_kitchens) {
+        auto str = std::string("---- Kitchen " + std::to_string(kitchen->getKitchenId()) + "----");
+
+        std::cout << str << std::endl;
+        std::cout << "Stock:" << std::endl;
+        std::cout << "\tDoe:" << (*kitchen->getData())->stockDoe << std::endl;
+        std::cout << "\tTomatoe:" << (*kitchen->getData())->stockTomato << std::endl;
+        std::cout << "\tGruyere:" << (*kitchen->getData())->stockGruyere << std::endl;
+        std::cout << "\tHam:" << (*kitchen->getData())->stockHam << std::endl;
+        std::cout << "\tMushrooms:" << (*kitchen->getData())->stockMushrooms << std::endl;
+        std::cout << "\tSteak:" << (*kitchen->getData())->stockSteak << std::endl;
+        std::cout << "\tEggPlant:" << (*kitchen->getData())->stockEggPlant << std::endl;
+        std::cout << "\tGoatCheese:" << (*kitchen->getData())->stockGoatCheese << std::endl;
+        std::cout << "\tChiefLove:" << (*kitchen->getData())->stockChiefLove << std::endl;
+        std::cout << "Free chiefs: " << (*kitchen->getData())->availableCooks << " / " << this->_cooksNumber << std::endl;
+        std::cout << std::string(str.length(), '-') << std::endl;
+    }
+}
+
+void plaz::Reception::quit() {
+    for (auto &[kitchen, process] : this->_kitchens) {
+        process->kill(0); // TODO @clement, ça ne kill pas le process :/ any idea ?
+    }
+    std::exit(0);
 }
