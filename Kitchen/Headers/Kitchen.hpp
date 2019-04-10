@@ -19,7 +19,6 @@ namespace plaz::kitchen {
 		~Kitchen() = default;
 
 		void runQueueListen();
-		void initKitchenStock();
 		std::map<int, plaz::abs::Process> *getCooksProcesses();
 	private:
 		std::map<int, plaz::abs::Process> *_cooksProcesses;

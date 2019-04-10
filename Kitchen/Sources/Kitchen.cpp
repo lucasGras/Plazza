@@ -29,7 +29,6 @@ int main(int ac, char **av) {
 plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int multiplier)
     : AKitchen(kitchenId, maxCooks, timeout, multiplier)
 {
-    this->initKitchenStock();
 /*    for (int cook = 0; cook < maxCooks; cook++) {
         this->_cooksProcesses->emplace(cook, plaz::abs::Process());
         (*this->_cooksProcesses)[cook].run([this]() -> int {
@@ -47,21 +46,9 @@ void plaz::kitchen::Kitchen::runQueueListen() {
         plaz::abs::DataQueue queue("/kitchen_msg_" + std::to_string(this->getKitchenId()), O_CREAT | O_RDWR);
         while (1) {
             std::string response = queue.pull();
-            (*this->getData())->availableCooks -= 1;
+            //(*this->getData())->availableCooks -= 1;
             std::cout << "[KITCHEN] [RECEIVED] (" << this->getKitchenId() << ") : '" << response << "'" << std::endl;
         }
     });
     thread.detach();
-}
-
-void plaz::kitchen::Kitchen::initKitchenStock() {
-    (*this->getData())->stockDoe = 5;
-    (*this->getData())->stockChiefLove = 5;
-    (*this->getData())->stockGoatCheese = 5;
-    (*this->getData())->stockEggPlant = 5;
-    (*this->getData())->stockSteak = 5;
-    (*this->getData())->stockMushrooms = 5;
-    (*this->getData())->stockHam = 5;
-    (*this->getData())->stockGruyere = 5;
-    (*this->getData())->stockTomato = 5;
 }

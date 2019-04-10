@@ -16,6 +16,7 @@
 #include "Abstractions/DataQueue.hpp"
 #include "Abstractions/Process.hpp"
 #include "Abstractions/SharedData.hpp"
+#include "PlazzaServerAPIManager.hpp"
 
 namespace plaz {
 
@@ -34,6 +35,7 @@ namespace plaz {
         int getMultiplier();
         int getMaxCooksNumber();
         int getKitchenStockTimeout();
+        const std::vector<plaz::AKitchen *> getRunningKitchens();
 
     private:
         int _multiplier;

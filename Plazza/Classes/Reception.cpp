@@ -65,7 +65,6 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
             auto sended = order.getPizza().pack();
             auto kitchen = getAvailableKitchen(order.getPizza());
             std::cout << "[RECEPTION] Send pizza in kitchen (" << kitchen->getKitchenId() << ")" << std::endl;
-            //(*kitchen->getData())->availableCooks--;
             kitchen->getQueue()->push(std::to_string(sended));
         }
     }
@@ -73,10 +72,13 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
 
 plaz::AKitchen *plaz::Reception::getAvailableKitchen(plaz::Pizza pizza) {
     for (auto &[kitchen, process] : this->_kitchens) {
+        (void)process;
         if ((*kitchen->getData())->availableCooks <= 0)
             continue;
-        if (pizza.checkCanConsumePizza(kitchen->getData()))
+        if (pizza.checkCanConsumePizza(kitchen->getData())) {
+            (*kitchen->getData())->availableCooks -= 1;
             return kitchen;
+        }
     }
     return this->initNewKitchen();
 }
@@ -87,7 +89,7 @@ plaz::AKitchen *plaz::Reception::initNewKitchen() {
     std::vector<std::string_view> args{std::to_string(kitchen->getKitchenId()), std::to_string(this->_cooksNumber), std::to_string(this->_kitchenStockTimeout), std::to_string(this->_multiplier)};
     std::vector<std::string_view> env;
 
-    (*kitchen->getData())->availableCooks = this->getMaxCooksNumber();
+    (*kitchen->getData())->availableCooks = this->getMaxCooksNumber() - 1;
     this->_kitchens.emplace(kitchen, process);
     std::cout << "[RECEPTION] Create new kitchen (" << kitchen->getKitchenId() << ")" << std::endl;
     process->exec(std::string_view("./kitchen"), args, env);
@@ -108,6 +110,7 @@ int plaz::Reception::getKitchenStockTimeout() {
 
 void plaz::Reception::status() {
     for (auto &[kitchen, process] : this->_kitchens) {
+        (void)process;
         auto str = std::string("---- Kitchen " + std::to_string(kitchen->getKitchenId()) + "----");
 
         std::cout << str << std::endl;
@@ -124,11 +127,23 @@ void plaz::Reception::status() {
         std::cout << "Free chiefs: " << (*kitchen->getData())->availableCooks << " / " << this->_cooksNumber << std::endl;
         std::cout << std::string(str.length(), '-') << std::endl;
     }
+    plaz::server::PlazzaServerAPIManager().refreshReception(this->getRunningKitchens());
 }
 
 void plaz::Reception::quit() {
     for (auto &[kitchen, process] : this->_kitchens) {
-        process->kill(0); // TODO @clement, ça ne kill pas le process :/ any idea ?
+        (void)kitchen;
+        process->kill(); // TODO @clement, ça ne kill pas le process :/ any idea ?
     }
     std::exit(0);
+}
+
+const std::vector<plaz::AKitchen *> plaz::Reception::getRunningKitchens() {
+    std::vector<plaz::AKitchen *> runningKitchens;
+
+    for (auto &[kitchen, process] : this->_kitchens) {
+        (void)process;
+        runningKitchens.push_back(kitchen);
+    }
+    return runningKitchens;
 }
