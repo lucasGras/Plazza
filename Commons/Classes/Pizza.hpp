@@ -34,8 +34,8 @@ namespace plaz {
 
         BitMask pack();
         plaz::Pizza unpack(BitMask bitmask);
-        PizzaType getType();
-        PizzaSize getSize();
+        PizzaType getType() const;
+        PizzaSize getSize() const;
         void consumePizza(plaz::abs::SharedData<KitchenData> *data);
         bool checkCanConsumePizza(plaz::abs::SharedData<KitchenData> *data);
 

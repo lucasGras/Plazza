@@ -21,8 +21,10 @@ namespace plaz {
 
 		int getKitchenId() const;
 		int getMaxCooks() const;
+		int getMultiplier() const;
 		plaz::abs::SharedData<KitchenData> *getData();
 		plaz::abs::DataQueue<> *getQueue();
+		void initKitchen();
 	private:
 		int _kitchenId;
 		int _maxCooks;

@@ -66,16 +66,8 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
             auto sended = order.getPizza().pack();
             auto kitchen = getAvailableKitchen(order.getPizza());
             std::cout << "[RECEPTION] Send pizza in kitchen (" << kitchen->getKitchenId() << ")" << std::endl;
-            for (int i = 0; i < 50; i++) {
-                if ((*kitchen->getData())->waitingPizzas[i] != -1)
-                    continue;
-                (*kitchen->getData())->waitingPizzas[i] = sended;
-                break;
-            }
-            (*kitchen->getData())->messageSendingToKitchen = 1;
-            while ((*kitchen->getData())->messageSendingToKitchen == 1);
-            //std::this_thread::sleep_for(std::chrono::milliseconds(2));
-            //kitchen->getQueue()->push(std::to_string(sended));
+            (*kitchen->getData())->waitingPizza = sended;
+            while ((*kitchen->getData())->waitingPizza != -1);
         }
     }
 }
@@ -83,7 +75,8 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
 plaz::AKitchen *plaz::Reception::getAvailableKitchen(plaz::Pizza pizza) {
     for (auto &[kitchen, process] : this->_kitchens) {
         (void)process;
-        //std::cout << "check kitchen " << kitchen->getKitchenId() << " availablecooks: " << (*kitchen->getData())->availableCooks << std::endl;
+        if ((*kitchen->getData())->waitingPizza != -1)
+            continue;
         if ((*kitchen->getData())->availableCooks <= 0)
             continue;
         if (pizza.checkCanConsumePizza(kitchen->getData())) {
@@ -99,7 +92,7 @@ plaz::AKitchen *plaz::Reception::initNewKitchen() {
     std::vector<std::string_view> args{std::to_string(kitchen->getKitchenId()), std::to_string(this->_cooksNumber), std::to_string(this->_kitchenStockTimeout), std::to_string(this->_multiplier)};
     std::vector<std::string_view> env;
 
-    (*kitchen->getData())->availableCooks = this->getMaxCooksNumber();
+    kitchen->initKitchen();
     this->_kitchens.emplace(kitchen, process);
     std::cout << "[RECEPTION] Create new kitchen (" << kitchen->getKitchenId() << ")" << std::endl;
     process->exec(std::string_view("./kitchen"), args, env);

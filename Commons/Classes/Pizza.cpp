@@ -43,11 +43,11 @@ plaz::Pizza plaz::Pizza::unpack(BitMask bitmask) {
     return *this;
 }
 
-plaz::PizzaType plaz::Pizza::getType() {
+plaz::PizzaType plaz::Pizza::getType() const {
     return this->_type;
 }
 
-plaz::PizzaSize plaz::Pizza::getSize() {
+plaz::PizzaSize plaz::Pizza::getSize() const {
     return this->_size;
 }
 

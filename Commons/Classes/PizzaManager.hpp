@@ -53,7 +53,10 @@ namespace plaz {
         }
     private:
         std::map<PizzaType, std::vector<Ingredients>> _ingredientsOfPizza = {
-                { Regina, { Doe, Tomato, Gruyere } },
+                { Margarita, { Doe, Tomato, Gruyere } },
+                { Regina, { Doe, Tomato, Gruyere, Ham, Mushrooms } },
+                { Americana, { Doe, Tomato, Gruyere, Steak } },
+                { Fantasia, { Doe, Tomato, Eggplant, GoatCheese, ChiefLove } }
         };
         std::map<PizzaType, int> _timesOfPizza = {
                 { Regina, 1 },
