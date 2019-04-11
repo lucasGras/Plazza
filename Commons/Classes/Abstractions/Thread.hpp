@@ -26,17 +26,11 @@ extern "C" {
 
 namespace plaz::abs {
 
-template<typename RET,
-        bool B = (std::is_default_constructible<RET>::value && (std::is_move_assignable<RET>::value || std::is_copy_constructible<RET>::value)),
-	typename ...ARGS>
+template<typename RET, bool B, typename ...ARGS>
 class ThreadImpl;
 
 template<typename RET, typename ...ARGS>
-class ThreadImpl<
-	RET,
-	true,
-	ARGS...
-	> {
+class ThreadImpl<RET, true, ARGS...> {
 public:
 	using Procedure = std::function<RET(ARGS...)>;
 private:
@@ -50,28 +44,27 @@ public:
 	ThreadImpl() = delete;
 	ThreadImpl(Procedure p, ARGS &&... args)
 	{
-//		auto procImpl = [](void *a) -> void * {
-//			ProcArgs *procArgs = static_cast<ProcArgs *>(a);
-//
-//			int ignore;
-//			pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &ignore);
-//			pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &ignore);
-//
-//			*(procArgs->running) = true;
-//
-//			if constexpr (std::is_move_assignable<RET>::value)
-//				*(procArgs->retValue) = std::move(procArgs->p());
-//			else
-//				*(procArgs->retValue) = procArgs->p();
-//			*(procArgs->returned) = true;
-//			*(procArgs->running) = false;
-//			return NULL;
-//		};
-//
-//		m_procArgs = ProcArgs{std::bind(p, args...), &m_running, &m_returned, &m_retValue};
-//
-//		pthread_create(&m_t, NULL, procImpl, &m_procArgs);
-		std::cout << "a" << std::endl;
+		auto procImpl = [](void *a) -> void * {
+			ProcArgs *procArgs = static_cast<ProcArgs *>(a);
+
+			int ignore;
+			pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &ignore);
+			pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &ignore);
+
+			*(procArgs->running) = true;
+
+			if constexpr (std::is_move_assignable<RET>::value)
+				*(procArgs->retValue) = std::move(procArgs->p());
+			else
+				*(procArgs->retValue) = procArgs->p();
+			*(procArgs->returned) = true;
+			*(procArgs->running) = false;
+			return NULL;
+		};
+
+		m_procArgs = ProcArgs{std::bind(p, args...), &m_running, &m_returned, &m_retValue};
+
+		pthread_create(&m_t, NULL, procImpl, &m_procArgs);
 	}
 
 	~ThreadImpl() = default;
@@ -154,7 +147,6 @@ public:
 		m_procArgs = ProcArgs{std::bind(p, args...), &m_running, &m_returned};
 
 		pthread_create(&m_t, NULL, procImpl, &m_procArgs);
-		std::cout << "b" << std::endl;
 	}
 
 	~ThreadImpl() = default;
