@@ -43,8 +43,24 @@ void plaz::AKitchen::initKitchen() {
     (*this->getData())->stockChiefLove = 5;
 }
 
+void plaz::AKitchen::refillStock() {
+    (*this->getData())->stockHam += 1;
+    (*this->getData())->stockDoe += 1;
+    (*this->getData())->stockTomato += 1;
+    (*this->getData())->stockGruyere += 1;
+    (*this->getData())->stockSteak += 1;
+    (*this->getData())->stockMushrooms += 1;
+    (*this->getData())->stockEggPlant += 1;
+    (*this->getData())->stockGoatCheese += 1;
+    (*this->getData())->stockChiefLove += 1;
+}
+
 int plaz::AKitchen::getMultiplier() const {
     return this->_multiplier;
+}
+
+int plaz::AKitchen::getTimeout() const {
+    return this->_timeout;
 }
 
 

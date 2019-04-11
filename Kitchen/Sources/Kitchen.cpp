@@ -23,7 +23,15 @@ int main(int ac, char **av) {
 
 plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int multiplier)
     : AKitchen(kitchenId, maxCooks, timeout, multiplier)
-{}
+{
+    std::thread thread([this]() {
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(this->getTimeout()));
+            this->refillStock();
+        }
+    });
+    thread.detach();
+}
 
 void plaz::kitchen::Kitchen::runQueueListen() {
     std::thread thread([this]() {
