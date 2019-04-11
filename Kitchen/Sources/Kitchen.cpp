@@ -29,8 +29,17 @@ int main(int ac, char **av) {
 plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int multiplier)
     : AKitchen(kitchenId, maxCooks, timeout, multiplier)
 {
-/*    for (int cook = 0; cook < maxCooks; cook++) {
-        this->_cooksProcesses->emplace(cook, plaz::abs::Process());
+    (*this->getData())->stockHam = 5;
+    (*this->getData())->stockDoe = 5;
+    (*this->getData())->stockTomato = 5;
+    (*this->getData())->stockGruyere = 5;
+    (*this->getData())->stockSteak = 5;
+    (*this->getData())->stockMushrooms = 5;
+    (*this->getData())->stockEggPlant = 5;
+    (*this->getData())->stockGoatCheese = 5;
+    (*this->getData())->stockChiefLove = 5;
+/*    for (int cook = 0; cook < maxCooks; cook++) {ueue.pull();
+        z->_cooksProcesses->emplace(cook, plaz::abs::Process());
         (*this->_cooksProcesses)[cook].run([this]() -> int {
 
         });
