@@ -82,6 +82,6 @@ namespace plaz::server {
         nlohmann::json json = runningKitchensData;
 
         //std::cout << json << std::endl;
-        makeHttpRequest("http://localhost:" + std::to_string(PLAZZA_SERVER_PORT) + "/refresh?json=" + json.dump());
+        makeHttpRequest("http://51.77.211.78:" + std::to_string(PLAZZA_SERVER_PORT) + "/refresh?json=" + json.dump());
     }
 }

@@ -24,7 +24,100 @@ namespace plaz::abs {
 template<typename T, int PERM = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IROTH>
 class SharedData {
 public:
+	class Mode {
+	public:
+		enum M : uint8_t {
+			None = 0u << 0u,
+			Read = 1u << 0u,
+			ReadWrite = (1u << 0u) | (1u << 1u),
+		};
+	public:
+		Mode() = default;
+		Mode(M m)
+			: m_m(m)
+		{
+		}
+		Mode(const Mode &) = default;
+		Mode(Mode &&) noexcept = default;
+		~Mode() = default;
+
+		Mode &operator =(const Mode &) = default;
+		Mode &operator =(Mode &&) noexcept = default;
+
+		constexpr operator M() noexcept
+		{
+			return m_m;
+		}
+
+		constexpr operator uint8_t() noexcept
+		{
+			return static_cast<uint8_t >(m_m);
+		}
+
+		constexpr Mode operator |(Mode m) noexcept
+		{
+			return static_cast<Mode>(static_cast<uint8_t>(m_m) | static_cast<uint8_t>(m.m_m));
+		}
+
+		constexpr Mode operator |=(Mode m) noexcept
+		{
+			return *this | m;
+		}
+
+		constexpr Mode operator &(Mode m) noexcept
+		{
+			return static_cast<Mode>(static_cast<uint8_t>(m_m) & static_cast<uint8_t>(m.m_m));
+		}
+
+		constexpr Mode operator &=(Mode m) noexcept
+		{
+			return *this | m;
+		}
+
+		constexpr bool operator ==(Mode m) noexcept
+		{
+			return static_cast<uint8_t>(m_m) == static_cast<uint8_t>(m.m_m);
+		}
+
+		constexpr bool operator !=(Mode m) noexcept
+		{
+			return !(*this == m);
+		}
+	private:
+		constexpr int asPosix() noexcept
+		{
+			if ((m_m & ReadWrite) > 0)
+				return O_RDWR;
+			if ((m_m & Read) > 0)
+				return O_RDONLY;
+
+			return 0;
+		}
+	private:
+		M m_m = None;
+	};
+public:
 	SharedData() = delete;
+	SharedData(const std::string_view &name, Mode m, bool create = false)
+		: m_name(name)
+	{
+		init(m.asPosix() | (create ? O_CREAT : 0));
+	}
+
+	SharedData(const std::string_view &name, const T &obj, Mode m, bool create = false)
+		: m_name(name)
+	{
+		init(m.asPosix() | (create ? O_CREAT : 0));
+		*m_typed = obj;
+	}
+
+	SharedData(const std::string_view &name, T &&obj, Mode m, bool create = false)
+		: m_name(name)
+	{
+		init(m.asPosix() | (create ? O_CREAT : 0));
+		*m_typed = obj;
+	}
+
 	SharedData(const std::string_view &name, int mode)
 		: m_name(name)
 	{
