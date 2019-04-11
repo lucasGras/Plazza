@@ -17,7 +17,7 @@ router.get('/', function(req, res) {
             } catch (e) {
                 res.send({"error": e.message}).status(500);
             }
-            res.send(jsonData).status(200);
+            res.send({"kitchens": jsonData}).status(200);
         }
     })
 });
