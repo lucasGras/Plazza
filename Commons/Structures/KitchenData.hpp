@@ -10,6 +10,14 @@
 
 struct KitchenData {
     int availableCooks;
+    int waitingPizzas[50] = {
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+    };
+    int messageSendingToKitchen = 0;
 
     int stockDoe;
     int stockTomato;

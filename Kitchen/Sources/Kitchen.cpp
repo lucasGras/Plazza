@@ -29,15 +29,6 @@ int main(int ac, char **av) {
 plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int multiplier)
     : AKitchen(kitchenId, maxCooks, timeout, multiplier)
 {
-    (*this->getData())->stockHam = 5;
-    (*this->getData())->stockDoe = 5;
-    (*this->getData())->stockTomato = 5;
-    (*this->getData())->stockGruyere = 5;
-    (*this->getData())->stockSteak = 5;
-    (*this->getData())->stockMushrooms = 5;
-    (*this->getData())->stockEggPlant = 5;
-    (*this->getData())->stockGoatCheese = 5;
-    (*this->getData())->stockChiefLove = 5;
 /*    for (int cook = 0; cook < maxCooks; cook++) {ueue.pull();
         z->_cooksProcesses->emplace(cook, plaz::abs::Process());
         (*this->_cooksProcesses)[cook].run([this]() -> int {
@@ -52,11 +43,20 @@ std::map<int, plaz::abs::Process> *plaz::kitchen::Kitchen::getCooksProcesses() {
 
 void plaz::kitchen::Kitchen::runQueueListen() {
     std::thread thread([this]() {
-        plaz::abs::DataQueue queue("/kitchen_msg_" + std::to_string(this->getKitchenId()), O_CREAT | O_RDWR);
+        //plaz::abs::DataQueue queue("/kitchen_msg_" + std::to_string(this->getKitchenId()), O_CREAT | O_RDWR);
         while (1) {
-            std::string response = queue.pull();
-            //(*this->getData())->availableCooks -= 1;
-            std::cout << "[KITCHEN] [RECEIVED] (" << this->getKitchenId() << ") : '" << response << "'" << std::endl;
+            if ((*this->getData())->messageSendingToKitchen == 0)
+                continue;
+            for (int i = 0; i < 50; i++) {
+                if ((*this->getData())->waitingPizzas[i] == -1)
+                    continue;
+                //std::string response = queue.pull();
+                //(*this->getData())->availableCooks -= 1;
+                std::cout << "[KITCHEN] [DETECTED PIZZA] (" << this->getKitchenId() << ") : '" << (*this->getData())->waitingPizzas[i] << "'" << std::endl;
+                (*this->getData())->availableCooks--;
+                (*this->getData())->waitingPizzas[i] = -1;
+                (*this->getData())->messageSendingToKitchen = 0;
+            }
         }
     });
     thread.detach();
