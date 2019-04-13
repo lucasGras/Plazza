@@ -74,6 +74,7 @@ public:
 
 	void cancel()
 	{
+
 		pthread_cancel(m_t);
 		pthread_join(m_t, NULL);
 		m_running = false;
@@ -124,7 +125,7 @@ private:
 	struct ProcArgs {
 		std::function<void(void)> p;
 		std::atomic_bool *running;
-		RET *retValue;
+		std::atomic_bool *returned;
 	};
 public:
 	ThreadImpl() = delete;
@@ -156,9 +157,11 @@ public:
 
 	void cancel()
 	{
-		pthread_cancel(m_t);
-		pthread_join(m_t, NULL);
-		m_running = false;
+		if (m_running) {
+			pthread_cancel(m_t);
+			pthread_join(m_t, NULL);
+			m_running = false;
+		}
 	}
 
 	void join()
@@ -195,6 +198,10 @@ using Thread = ThreadImpl<RET,
 	(std::is_default_constructible<RET>::value && (std::is_move_assignable<RET>::value || std::is_copy_constructible<RET>::value)),
 	ARGS...>;
 
+static inline void threadYield()
+{
+	pthread_yield();
+}
 
 }
 

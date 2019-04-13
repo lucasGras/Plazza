@@ -12,9 +12,11 @@
 #include <memory>
 #include <thread>
 #include <mutex>
-#include <shared_mutex>
 #include <condition_variable>
 #include <atomic>
+
+#include "Thread.hpp"
+#include "Mutex.hpp"
 
 namespace plaz::abs {
 
@@ -24,17 +26,17 @@ public:
 	Channel() = delete;
 
 	Channel(std::size_t size = 1)
-		: m_s(size), m_q(new std::queue<T>())
+		: m_s(size), m_c(new std::atomic_uint64_t(0)), m_q(new std::queue<T>()), m_l(new Mutex())
 	{
 	}
 
 	Channel(const Channel &c)
-		: m_s(c.m_s), m_count(std::move(c.m_count)), m_q(c.m_q)
+		: m_s(c.m_s), m_c(c.m_c), m_q(c.m_q), m_l(c.m_l)
 	{
 	}
 
 	Channel(Channel &&c) noexcept
-		: m_s(c.m_s), m_count(std::move(c.m_count)), m_q(std::move(c.mq))
+		: m_s(c.m_s), m_c(std::move(c.m_c)), m_q(std::move(c.m_q)), m_l(std::move(c.m_l))
 	{
 	}
 
@@ -56,7 +58,14 @@ public:
 
 	void push(T &&obj)
 	{
+		//TODO(clément): replace this with a conditional variable
+		while (isFilled())
+			threadYield();
 
+		m_l->lock();
+		m_q->push(obj);
+		m_l->unlock();
+		(*m_c)++;
 	}
 
 	inline bool tryPush(T &&obj)
@@ -69,14 +78,16 @@ public:
 
 	T pop()
 	{
-		while (isEmpty())
-			std::this_thread::yield();
+		//TODO(clément): replace this with a conditional variable
 
-		m_queueLock.lock_shared();
+		while (isEmpty())
+			threadYield();
+
+		m_l->lock();
 		T temp = m_q->front();
 		m_q->pop();
-		m_queueLock.unlock_shared();
-		m_count--;
+		m_l->unlock();
+		(*m_c)--;
 		return std::move(temp);
 	}
 
@@ -90,21 +101,25 @@ public:
 
 	inline bool isFilled() const noexcept
 	{
-		return m_count >= m_s;
+		return (*m_c) >= m_s;
 	}
 
 	inline bool isEmpty() const noexcept
 	{
-		return m_count == 0;
+		return *(m_c) == 0;
 	}
 
 private:
+	//TODO(clément): find a better workaround
+	using Counter = std::shared_ptr<std::atomic_uint64_t>;
 	using Queue = std::shared_ptr<std::queue<T>>;
+	using Lock = std::shared_ptr<Mutex>;
 private:
-	std::shared_mutex m_queueLock;
 	const std::size_t m_s = 1;
-	std::atomic_uint64_t m_count = 0;
+	Counter m_c = nullptr;
 	Queue m_q = nullptr;
+	Lock m_l = nullptr;
+
 };
 
 }
