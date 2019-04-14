@@ -37,6 +37,7 @@ router.get('/orders', function(req, res) {
             } catch (e) {
                 res.send({"error": e.message}).status(500);
             }
+            fs.writeFileSync("/../tmp/orders.json", "", 'utf8');
             res.send(jsonData).status(200);
         }
     })
