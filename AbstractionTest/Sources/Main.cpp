@@ -9,6 +9,7 @@ extern "C" {
 
 #include <fcntl.h>
 #include <unistd.h>
+#include <pthread.h>
 
 }
 
@@ -20,7 +21,8 @@ extern "C" {
 #include "Abstractions/Process.hpp"
 #include "Abstractions/Thread.hpp"
 #include "Abstractions/Channel.hpp"
-
+#include "Abstractions/LockingBool.hpp"
+#include "Abstractions/ExternLock.hpp"
 
 static inline void sleepSecond(unsigned long s)
 {
@@ -29,43 +31,50 @@ static inline void sleepSecond(unsigned long s)
 
 using namespace plaz::abs;
 
-void lel(Channel<int> &c)
+void lel(LockingBool<> &b)
 {
-	std::cout << c.pop() << std::endl;
+	int i = 10;
+
+	while (b) {
+		std::cout << i << std::endl;
+		i++;
+		sleepSecond(1);
+	}
+}
+
+void *jeej(void *in)
+{
+	pthread_mutex_t *m = (pthread_mutex_t *)in;
+	std::cout << pthread_mutex_trylock(m) << std::endl;
 	sleepSecond(2);
-	std::cout << c.pop() << std::endl;
-	std::cout << c.pop() << std::endl;
-	std::cout << c.pop() << std::endl;
-	std::cout << c.pop() << std::endl;
-	std::cout << c.pop() << std::endl;
-	std::cout << "kek" << std::endl;
+	std::cout << pthread_mutex_trylock(m) << std::endl;
+	sleepSecond(2);
+	pthread_mutex_unlock(m);
+	return NULL;
 }
 
 int main(int, char * const [])
 {
-	Channel<int> c(3);
-	//Premier paramètre le type de retour de la procédure passé, les reste type des arguments
-	//TOUJOUR utilisé thread (wrapper de thread impl pour des raisons que je n'expliquerai pas ici)
-	//Le thread est lancé dès que le constructeur est appellé
-	Thread<void, Channel<int> &> t(lel, c);
 
-	c.push(1);
-	c.push(2);
-	c.push(3);
-	c.push(4);
-	c.push(5);
+//	LockingBool<> kek = true;
+//
+//	Thread<void, LockingBool<> &> t(lel, kek);
+//
+//	std::cout << "a" << std::endl;
+//	sleepSecond(3);
+//	kek = false;
+//	std::cout << "b" << std::endl;
+//	sleepSecond(4);
+//	kek = true;
+//	sleepSecond(2);
+//	t.cancel();
+	pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
+	pthread_t t;
+
+	pthread_create(&t, NULL, jeej, &m);
+	sleepSecond(1);
+	pthread_mutex_lock(&m);
 	std::cout << "lel" << std::endl;
-	sleepSecond(2);
-	std::cout << "lul" << std::endl;
-	c.push(6);
-	std::cout << "kuk" << std::endl;
-
-	//TOUJOUR join à la fin même si le thread est terminé (sauf si il a été cancel)
-	//t.hasReturned() dit si la procédure passé en argument s'est correctement terminé ou non,
-	// et si oui la valeur de retour si elle est récupérable est retourné par t.getReturnValue
-	//t.isRunning() dit si la procédure est terminé. La différence avec t.hasReturned() se fait quand
-	//le thread est cancel, la procédure n'aura pas forcément retourné mais ne sera plus en court
-	//t.detach() j'ai pas compris comment ça marche mais ouais
-	t.join();
+	pthread_join(t, NULL);
 	return 0;
 }

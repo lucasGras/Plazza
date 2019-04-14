@@ -117,6 +117,7 @@ public:
 		init(m.asPosix() | (create ? O_CREAT : 0));
 	}
 
+	//TODO(clément): remove this constructor
 	explicit DataQueue(const std::string_view &name, int mode)
 		: m_name(name)
 	{
@@ -150,11 +151,41 @@ public:
 		push(std::string_view(msg));
 	}
 
+	//TODO(clément): replaced by pop
 	std::string pull()
 	{
 		ssize_t s = mq_receive(m_fd, buff, MAX_MSG_SIZE, NULL);
 		//TODO(clément): check for error (if s < 0)
 		return std::string(buff, s);
+	}
+
+	std::string pop()
+	{
+		ssize_t s = mq_receive(m_fd, buff, MAX_MSG_SIZE, NULL);
+		//TODO(clément): check for error (if s < 0)
+		return std::string(buff, s);
+	}
+
+	DataQueue &operator >>(std::string &out)
+	{
+		out = pop();
+
+		return *this;
+	}
+
+	DataQueue &operator <<(const std::string &msg)
+	{
+		push(msg);
+	}
+
+	DataQueue &operator <<(const std::string_view &msg)
+	{
+		push(msg);
+	}
+
+	DataQueue &operator <<(const char *msg)
+	{
+		push(msg);
 	}
 private:
 	void init(int mode)

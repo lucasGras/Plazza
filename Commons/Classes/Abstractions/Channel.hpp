@@ -26,17 +26,17 @@ public:
 	Channel() = delete;
 
 	Channel(std::size_t size = 1)
-		: m_s(size), m_c(new std::atomic_uint64_t(0)), m_q(new std::queue<T>()), m_l(new Mutex())
+		: m_s(size), m_m(new Members{.m_c = 0, .m_q = std::queue<T>()})
 	{
 	}
 
 	Channel(const Channel &c)
-		: m_s(c.m_s), m_c(c.m_c), m_q(c.m_q), m_l(c.m_l)
+		: m_s(c.m_s), m_m(c.m_m), m_l(c.m_l)
 	{
 	}
 
 	Channel(Channel &&c) noexcept
-		: m_s(c.m_s), m_c(std::move(c.m_c)), m_q(std::move(c.m_q)), m_l(std::move(c.m_l))
+		: m_s(c.m_s), m_m(std::move(c.m_m)), m_l(std::move(c.m_l))
 	{
 	}
 
@@ -49,11 +49,15 @@ public:
 	Channel &operator <<(T &&obj)
 	{
 		push(obj);
+
+		return *this;
 	}
 
 	Channel &operator >>(T &obj)
 	{
 		obj = pop();
+
+		return *this;
 	}
 
 	void push(T &&obj)
@@ -62,10 +66,10 @@ public:
 		while (isFilled())
 			threadYield();
 
-		m_l->lock();
-		m_q->push(obj);
-		m_l->unlock();
-		(*m_c)++;
+		m_l.lock();
+		m_m->m_q.push(obj);
+		m_l.unlock();
+		m_m->m_c++;
 	}
 
 	inline bool tryPush(T &&obj)
@@ -83,11 +87,11 @@ public:
 		while (isEmpty())
 			threadYield();
 
-		m_l->lock();
-		T temp = m_q->front();
-		m_q->pop();
-		m_l->unlock();
-		(*m_c)--;
+		m_l.lock();
+		T temp = m_m->m_q.front();
+		m_m->m_q.pop();
+		m_l.unlock();
+		m_m->m_c--;
 		return std::move(temp);
 	}
 
@@ -101,25 +105,26 @@ public:
 
 	inline bool isFilled() const noexcept
 	{
-		return (*m_c) >= m_s;
+		return m_m->m_c >= m_s;
 	}
 
 	inline bool isEmpty() const noexcept
 	{
-		return *(m_c) == 0;
+		return m_m->m_c == 0;
 	}
-
 private:
-	//TODO(clément): find a better workaround
-	using Counter = std::shared_ptr<std::atomic_uint64_t>;
-	using Queue = std::shared_ptr<std::queue<T>>;
-	using Lock = std::shared_ptr<Mutex>;
+	void waitUntilNotEmpty() const;
+	void waitUntilNotFilled() const;
+private:
+	struct Members {
+		std::atomic_uint64_t m_c;
+		std::queue<T> m_q;
+	};
+	using SharedMem = const std::shared_ptr<Members>;
 private:
 	const std::size_t m_s = 1;
-	Counter m_c = nullptr;
-	Queue m_q = nullptr;
-	Lock m_l = nullptr;
-
+	Mutex m_l;
+	SharedMem m_m = nullptr;
 };
 
 }
