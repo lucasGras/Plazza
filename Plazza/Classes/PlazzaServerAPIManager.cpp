@@ -107,7 +107,7 @@ namespace plaz::server {
     }
 
     std::vector<plaz::Order> PlazzaServerAPIManager::getOrders() {
-        auto buffer = makeHttpRequest<std::string>("http://127.0.0.1:" + std::to_string(PLAZZA_SERVER_PORT) + "/status/orders");
+        auto buffer = makeHttpRequest<std::string>("http://51.77.211.78:" + std::to_string(PLAZZA_SERVER_PORT) + "/status/orders");
 
         return plaz::Order::getOrdersFromJson(buffer);
     }
