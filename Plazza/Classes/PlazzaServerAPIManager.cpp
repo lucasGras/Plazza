@@ -38,6 +38,21 @@ namespace plaz::server {
     }
 
     /**
+     * @brief Write data curl function, used to avoid curl to display on term
+     * @param buffer
+     * @param size
+     * @param nmemb
+     * @param userp
+     * @return size_t
+     */
+    static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp)
+    {
+        (void)buffer;
+        (void)userp;
+        return size * nmemb;
+    }
+
+    /**
      * @brief Make http request (GET) using curl to update the current running kitchens json file
      * @param json
      * @return
@@ -50,6 +65,8 @@ namespace plaz::server {
         curl = curl_easy_init();
         if (curl) {
             curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+            curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
             res = curl_easy_perform(curl);
             curl_easy_cleanup(curl);
             return res;
@@ -77,11 +94,27 @@ namespace plaz::server {
         j["chieflove"] = value.stockChiefLove;
     }
 
-    void PlazzaServerAPIManager::refreshReception(const std::vector<plaz::AKitchen *> runningKitchens) {
+    void PlazzaServerAPIManager::refreshReception(std::vector<plaz::AKitchen *> runningKitchens) {
         auto runningKitchensData = getRunningKitchensData(runningKitchens);
         nlohmann::json json = runningKitchensData;
 
-        //std::cout << json << std::endl;
-        makeHttpRequest("http://51.77.211.78:" + std::to_string(PLAZZA_SERVER_PORT) + "/refresh?json=" + json.dump());
+        if (makeHttpRequest("http://51.77.211.78:" + std::to_string(PLAZZA_SERVER_PORT) + "/refresh?json=" + json.dump()) < 0)
+            std::cerr << "Error making http request" << std::endl;
+    }
+
+    void PlazzaServerAPIManager::runApi(plaz::Reception *reception, std::string flag) {
+        if (!flag.empty() && flag != "--no-api" && flag != "--server") {
+            std::cerr << "Error: invalid argument (" << flag << ")" << std::endl;
+            std::exit(84);
+        }
+        if (flag == "--no-api")
+            return;
+        std::thread apiThread([this, reception]() {
+            while (true) {
+                this->refreshReception(reception->getRunningKitchens());
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            }
+        });
+        apiThread.detach();
     }
 }

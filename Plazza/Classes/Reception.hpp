@@ -11,12 +11,13 @@
 #include <map>
 #include <iostream>
 #include <vector>
+#include <thread>
 #include <Order.hpp>
 #include <AKitchen.hpp>
 #include "Abstractions/DataQueue.hpp"
 #include "Abstractions/Process.hpp"
 #include "Abstractions/SharedData.hpp"
-#include "PlazzaServerAPIManager.hpp"
+#include "Abstractions/Thread.hpp"
 
 namespace plaz {
 
@@ -35,7 +36,7 @@ namespace plaz {
         int getMultiplier();
         int getMaxCooksNumber();
         int getKitchenStockTimeout();
-        const std::vector<plaz::AKitchen *> getRunningKitchens();
+        std::vector<plaz::AKitchen *> getRunningKitchens() const;
 
     private:
         int _multiplier;

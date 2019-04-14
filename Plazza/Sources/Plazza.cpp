@@ -13,20 +13,17 @@
 #include "Pizza.hpp"
 #include "Reception.hpp"
 #include "Abstractions/SharedData.hpp"
+#include "Abstractions/Thread.hpp"
+#include "PlazzaServerAPIManager.hpp"
 
 int main(int ac, const char **av) {
-    if (ac != 4)
+    if (ac <= 3 || ac >= 6)
         return (84);
-    plaz::Reception reception(av[1], av[2], av[3]);
-    reception.receiveOrders();
-    return (0);
-    //std::cout << "Avaiable Cooks: " << kitchen.getData()->operator*().availableCooks << std::endl;
+    plaz::Reception *reception = new plaz::Reception(av[1], av[2], av[3]);
+    plaz::server::PlazzaServerAPIManager manager;
 
-    /*plaz::abs::SharedData<KitchenData> sharedData("/kitchen01", O_CREAT | O_RDWR);
-    while (1) {
-        std::cout << "Avaiable Cooks: " << sharedData->avalaibleCooks << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-    }*/
-    /*
-    return 0;*/
+    manager.runApi(reception, (ac == 5) ? std::string(av[4]) : std::string(""));
+    reception->receiveOrders();
+    delete reception;
+    return (0);
 }

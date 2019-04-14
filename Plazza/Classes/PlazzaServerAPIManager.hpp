@@ -7,12 +7,12 @@
 #ifndef PLAZZA_PLAZZASERVERAPIMANAGER_HPP
 #define PLAZZA_PLAZZASERVERAPIMANAGER_HPP
 
-#include "../../Commons/Vendor/nlohmann/json.hpp"
-#include "Reception.hpp"
-
 extern "C" {
     #include <curl/curl.h>
 };
+
+#include "../../Commons/Vendor/nlohmann/json.hpp"
+#include "Reception.hpp"
 
 #define PLAZZA_SERVER_PORT 3042
 
@@ -37,7 +37,8 @@ namespace plaz::server {
         PlazzaServerAPIManager() = default;
         ~PlazzaServerAPIManager() = default;
 
-        void refreshReception(const std::vector<plaz::AKitchen *>);
+        void refreshReception(std::vector<plaz::AKitchen *>);
+        void runApi(plaz::Reception *reception, std::string timer);
     };
 }
 

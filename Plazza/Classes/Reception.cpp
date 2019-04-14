@@ -5,7 +5,7 @@
 ** Created by lucasg,
 */
 #include "Reception.hpp"
-#include <thread>
+
 
 static inline void ltrim(std::string &s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
@@ -48,8 +48,10 @@ void plaz::Reception::receiveOrders() {
             this->status();
             continue;
         }
-        if (line == "exit")
+        if (line == "exit") {
             this->quit();
+            break;
+        }
         for (const auto &order : vector) {
             orders.emplace_back(order);
         }
@@ -130,18 +132,16 @@ void plaz::Reception::status() {
         std::cout << "Free chiefs: " << (*kitchen->getData())->availableCooks << " / " << this->_cooksNumber << std::endl;
         std::cout << std::string(str.length(), '-') << std::endl;
     }
-    plaz::server::PlazzaServerAPIManager().refreshReception(this->getRunningKitchens());
 }
 
 void plaz::Reception::quit() {
     for (auto &[kitchen, process] : this->_kitchens) {
         (void)kitchen;
-        process->kill(); // TODO @clement, ça ne kill pas le process :/ any idea ?
+        process->kill();
     }
-    std::exit(0);
 }
 
-const std::vector<plaz::AKitchen *> plaz::Reception::getRunningKitchens() {
+std::vector<plaz::AKitchen *> plaz::Reception::getRunningKitchens() const {
     std::vector<plaz::AKitchen *> runningKitchens;
 
     for (auto &[kitchen, process] : this->_kitchens) {
