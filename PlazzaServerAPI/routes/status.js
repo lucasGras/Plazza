@@ -30,14 +30,14 @@ router.get('/orders', function(req, res) {
         if (err) {
             res.send({"error": err.message}).status(500);
         } else {
-            let jsonData = {};
+            let jsonData = [];
 
             try {
                 jsonData = JSON.parse(data.toString());
             } catch (e) {
                 res.send({"error": e.message}).status(500);
             }
-            fs.writeFileSync("/../tmp/orders.json", "", 'utf8');
+            fs.writeFileSync(__dirname + "/../tmp/orders.json", "[]", 'utf8');
             res.send(jsonData).status(200);
         }
     })
