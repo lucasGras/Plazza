@@ -60,6 +60,13 @@ void plaz::Reception::receiveOrders() {
     }
 }
 
+void plaz::Reception::serverModeReception() {
+    for (std::string line; std::getline(std::cin, line);) {
+        if (line == "exit")
+            break;
+    }
+}
+
 void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
     for (auto &order : orders) {
         for (int i = 0; i < order.getAmount(); i++) {
@@ -149,4 +156,12 @@ std::vector<plaz::AKitchen *> plaz::Reception::getRunningKitchens() const {
         runningKitchens.push_back(kitchen);
     }
     return runningKitchens;
+}
+
+void plaz::Reception::setServerMode() {
+    this->serverMode = true;
+}
+
+bool plaz::Reception::isServerMode() {
+    return this->serverMode;
 }

@@ -11,8 +11,10 @@
 #include "Pizza.hpp"
 #include <regex>
 #include <iostream>
+#include "../../Commons/Vendor/nlohmann/json.hpp"
 
 namespace plaz {
+
     class Order {
     public:
         Order(const std::string &order);
@@ -21,6 +23,8 @@ namespace plaz {
         Pizza getPizza();
         bool isValid();
         int getAmount();
+
+        static std::vector<plaz::Order> getOrdersFromJson(const std::string &json);
 
     private:
         inline bool isValidOrder(const std::string &order);

@@ -47,8 +47,7 @@ namespace plaz::server {
      */
     static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp)
     {
-        (void)buffer;
-        (void)userp;
+        ((std::string*)userp)->append((char*)buffer, size * nmemb);
         return size * nmemb;
     }
 
@@ -57,21 +56,26 @@ namespace plaz::server {
      * @param json
      * @return
      */
-    static int makeHttpRequest(const std::string &url)
+    template <typename T>
+    static T makeHttpRequest(const std::string &url)
     {
         CURL *curl;
         CURLcode res;
+        std::string buffer;
 
         curl = curl_easy_init();
         if (curl) {
             curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
             curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
             res = curl_easy_perform(curl);
             curl_easy_cleanup(curl);
-            return res;
+            if constexpr (std::is_same_v<T, std::string>)
+                return buffer;
+            else if constexpr (std::is_same_v<T, int>)
+                return res;
         }
-        return -1;
     }
 
     /**
@@ -98,8 +102,14 @@ namespace plaz::server {
         auto runningKitchensData = getRunningKitchensData(runningKitchens);
         nlohmann::json json = runningKitchensData;
 
-        if (makeHttpRequest("http://51.77.211.78:" + std::to_string(PLAZZA_SERVER_PORT) + "/refresh?json=" + json.dump()) < 0)
+        if (makeHttpRequest<int>("http://51.77.211.78:" + std::to_string(PLAZZA_SERVER_PORT) + "/refresh?json=" + json.dump()) != 0)
             std::cerr << "Error making http request" << std::endl;
+    }
+
+    std::vector<plaz::Order> PlazzaServerAPIManager::getOrders() {
+        auto buffer = makeHttpRequest<std::string>("http://127.0.0.1:" + std::to_string(PLAZZA_SERVER_PORT) + "/status/orders");
+
+        return plaz::Order::getOrdersFromJson(buffer);
     }
 
     void PlazzaServerAPIManager::runApi(plaz::Reception *reception, std::string flag) {
@@ -109,12 +119,23 @@ namespace plaz::server {
         }
         if (flag == "--no-api")
             return;
-        std::thread apiThread([this, reception]() {
-            while (true) {
-                this->refreshReception(reception->getRunningKitchens());
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-            }
-        });
-        apiThread.detach();
+        if (flag == "--server") {
+            reception->setServerMode();
+            std::thread serverThread([this, reception]() {
+                while (true) {
+                    reception->sendOrders(this->getOrders());
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                }
+            });
+            serverThread.detach();
+        } else {
+            std::thread apiThread([this, reception]() {
+                while (true) {
+                    this->refreshReception(reception->getRunningKitchens());
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                }
+            });
+            apiThread.detach();
+        }
     }
 }

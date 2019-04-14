@@ -38,6 +38,8 @@ namespace plaz::server {
         ~PlazzaServerAPIManager() = default;
 
         void refreshReception(std::vector<plaz::AKitchen *>);
+        std::vector<plaz::Order> getOrders();
+
         void runApi(plaz::Reception *reception, std::string timer);
     };
 }

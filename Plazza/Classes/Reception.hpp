@@ -32,17 +32,21 @@ namespace plaz {
         void quit();
         plaz::AKitchen *getAvailableKitchen(plaz::Pizza);
         plaz::AKitchen *initNewKitchen();
+        void serverModeReception();
+        void setServerMode();
 
         int getMultiplier();
         int getMaxCooksNumber();
         int getKitchenStockTimeout();
         std::vector<plaz::AKitchen *> getRunningKitchens() const;
+        bool isServerMode();
 
     private:
         int _multiplier;
         int _cooksNumber;
         int _kitchenStockTimeout;
         std::map<plaz::AKitchen*, plaz::abs::Process*> _kitchens;
+        bool serverMode;
     };
 }
 

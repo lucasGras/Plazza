@@ -23,7 +23,13 @@ int main(int ac, const char **av) {
     plaz::server::PlazzaServerAPIManager manager;
 
     manager.runApi(reception, (ac == 5) ? std::string(av[4]) : std::string(""));
-    reception->receiveOrders();
+    if (!reception->isServerMode()) {
+        reception->receiveOrders();
+    } else {
+        std::cout << "Plazza launched in server mode..." << std::endl;
+        reception->serverModeReception();
+
+    }
     delete reception;
     return (0);
 }
