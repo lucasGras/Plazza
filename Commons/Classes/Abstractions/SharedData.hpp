@@ -9,10 +9,12 @@
 #define SHARED_DATA_HPP
 
 extern "C" {
+
 	#include <sys/stat.h>
 	#include <sys/mman.h>
 	#include <fcntl.h>
 	#include <unistd.h>
+
 }
 
 #include <string_view>
@@ -118,6 +120,7 @@ public:
 		*m_typed = obj;
 	}
 
+	//TDOO(ckément): remove those constructors
 	SharedData(const std::string_view &name, int mode)
 		: m_name(name)
 	{
@@ -187,6 +190,22 @@ public:
 		return *this;
 	}
 
+	SharedData &operator <<(const T &obj) noexcept
+	{
+		return (*this = obj);
+	}
+
+	SharedData &operator <<(T &&obj) noexcept
+	{
+		return (*this = obj);
+	}
+
+	SharedData &operator >>(T &obj)
+	{
+		obj = *m_typed;
+
+		return *this;
+	}
 private:
 	void init(int mode)
 	{
