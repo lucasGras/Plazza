@@ -102,7 +102,7 @@ namespace plaz::server {
         auto runningKitchensData = getRunningKitchensData(runningKitchens);
         nlohmann::json json = runningKitchensData;
 
-        if (makeHttpRequest<int>("http://51.77.211.78:" + std::to_string(PLAZZA_SERVER_PORT) + "/refresh?json=" + json.dump()) != 0)
+        if (makeHttpRequest<int>("http://51.77.211.78:" + std::to_string(PLAZZA_SERVER_PORT) + "/refresh/shared?json=" + json.dump()) != 0)
             std::cerr << "Error making http request" << std::endl;
     }
 
@@ -125,6 +125,7 @@ namespace plaz::server {
                 while (true) {
                     reception->sendOrders(this->getOrders());
                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                    this->refreshReception(reception->getRunningKitchens());
                 }
             });
             serverThread.detach();

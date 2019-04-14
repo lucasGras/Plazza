@@ -5,6 +5,7 @@
 ** Created by lucasg,
 */
 #include "Reception.hpp"
+#include "PlazzaServerAPIManager.hpp"
 
 
 static inline void ltrim(std::string &s) {
