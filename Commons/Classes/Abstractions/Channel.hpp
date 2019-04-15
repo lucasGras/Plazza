@@ -17,6 +17,8 @@
 
 #include "Thread.hpp"
 #include "Mutex.hpp"
+#include "LockingBool.hpp"
+
 
 namespace plaz::abs {
 
@@ -36,7 +38,7 @@ public:
 	}
 
 	Channel(Channel &&c) noexcept
-		: m_s(c.m_s), m_m(std::move(c.m_m)), m_l(std::move(c.m_l))
+		: m_s(c.m_s), m_m(c.m_m), m_l(c.m_l)
 	{
 	}
 
@@ -48,7 +50,7 @@ public:
 
 	Channel &operator <<(T &&obj)
 	{
-		push(obj);
+		push(std::move(obj));
 
 		return *this;
 	}
@@ -83,7 +85,6 @@ public:
 	T pop()
 	{
 		//TODO(clément): replace this with a conditional variable
-
 		while (isEmpty())
 			threadYield();
 
@@ -123,8 +124,8 @@ private:
 	using SharedMem = const std::shared_ptr<Members>;
 private:
 	const std::size_t m_s = 1;
-	Mutex m_l;
 	SharedMem m_m = nullptr;
+	Mutex m_l;
 };
 
 }

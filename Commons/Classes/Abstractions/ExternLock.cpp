@@ -21,8 +21,8 @@ ExternLock::ExternLock(const ExternLock &l)
 {
 }
 
-ExternLock::ExternLock(ExternLock &&l)
-	: m_m(std::move(l.m_m))
+ExternLock::ExternLock(ExternLock &&l) noexcept
+	: m_m(l.m_m)
 {
 }
 
