@@ -11,7 +11,7 @@
 struct KitchenData {
     int availableCooks;
     int waitingPizza;
-
+    int maxCooks;
     int stockDoe;
     int stockTomato;
     int stockGruyere;

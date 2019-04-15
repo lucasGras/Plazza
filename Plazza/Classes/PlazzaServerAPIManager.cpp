@@ -20,7 +20,9 @@ namespace plaz::server {
         for (auto &kitchen : runningKitchens) {
             plaz::server::paquet_t paquet = {
                     kitchen->getKitchenId(),
+                    (*kitchen->getData())->maxCooks,
                     (*kitchen->getData())->availableCooks,
+                    (*kitchen->getData())->waitingPizza,
                     (*kitchen->getData())->stockDoe,
                     (*kitchen->getData())->stockTomato,
                     (*kitchen->getData())->stockGruyere,
@@ -29,7 +31,7 @@ namespace plaz::server {
                     (*kitchen->getData())->stockHam,
                     (*kitchen->getData())->stockEggPlant,
                     (*kitchen->getData())->stockGoatCheese,
-                    (*kitchen->getData())->stockChiefLove,
+                    (*kitchen->getData())->stockChiefLove
             };
 
             runningKitchensData.push_back(paquet);
@@ -86,7 +88,9 @@ namespace plaz::server {
      */
     void to_json(nlohmann::json &j, const paquet_t &value) {
         j["id"] = value.id;
+        j["max_cooks"] = value.max_cooks;
         j["available_cooks"] = value.available_cooks;
+        j["waiting_pizza"] = value.waiting_pizza;
         j["doe"] = value.stockDoe;
         j["tomato"] = value.stockTomato;
         j["gruyere"] = value.stockGruyere;

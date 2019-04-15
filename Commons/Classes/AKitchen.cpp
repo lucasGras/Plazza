@@ -41,6 +41,7 @@ void plaz::AKitchen::initKitchen() {
     (*this->getData())->stockEggPlant = 5;
     (*this->getData())->stockGoatCheese = 5;
     (*this->getData())->stockChiefLove = 5;
+    (*this->getData())->maxCooks = this->getMaxCooks();
 }
 
 void plaz::AKitchen::refillStock() {

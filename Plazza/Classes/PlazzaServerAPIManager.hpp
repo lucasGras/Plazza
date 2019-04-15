@@ -20,7 +20,9 @@ namespace plaz::server {
 
     typedef struct paquet_s {
         int id;
+        int max_cooks;
         int available_cooks;
+        int waiting_pizza;
         int stockDoe;
         int stockTomato;
         int stockGruyere;
