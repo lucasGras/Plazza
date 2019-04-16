@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
 PROJECT(plazza CXX)
 
-SET(FLAG -Wall -Wextra -Wunused)
+SET(FLAG -Wall -Wextra -Wunused -Wno-missing-field-initializers)
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     SET(FLAG ${FLAG} -g3 -DDEBUG=1)
 endif()

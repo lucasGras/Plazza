@@ -34,8 +34,8 @@ public:
 	{
 	}
 
-	LockingBool(LockingBool &&b)
-		: m_m(std::move(b.m_m))
+	LockingBool(LockingBool &&b) noexcept
+		: m_m(b.m_m)
 	{
 	}
 

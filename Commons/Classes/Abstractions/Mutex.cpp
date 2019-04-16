@@ -7,6 +7,8 @@
 
 #include "Mutex.hpp"
 
+#include <iostream> //TODO(clément): remove this
+
 namespace plaz::abs {
 
 Mutex::Mutex()
@@ -20,9 +22,10 @@ Mutex::Mutex(const Mutex &m)
 {
 }
 
-Mutex::Mutex(Mutex &&m)
-	: m_m(std::move(m.m_m))
+Mutex::Mutex(Mutex &&m) noexcept
+	: m_m(m.m_m)
 {
+	std::cout << "mutex move" << std::endl;
 }
 
 Mutex::~Mutex()
