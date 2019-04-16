@@ -66,6 +66,7 @@ void plaz::Reception::serverModeReception() {
         if (line == "exit")
             break;
     }
+    this->quit();
 }
 
 void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
