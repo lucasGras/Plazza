@@ -21,7 +21,7 @@ extern "C" {
 #include <cstring>
 #include <iostream>
 
-#include "Logger/Log.hpp"
+#include "Debug/Log.hpp"
 
 namespace plaz::abs {
 
@@ -216,9 +216,9 @@ private:
 		//TODO(clément): check for fail of shm open and mmap
 			m_fd = shm_open(m_name.data(), mode, PERM);
 			if (m_fd < 0)
-				log::cerr << "Shared data:" << std::endl << "shm_open failed -> " << log::cerrno << std::endl;
+				debug::logErr << "Shared data:" << std::endl << "shm_open failed -> " << debug::cerrno << std::endl;
 			if (ftruncate(m_fd, sizeof(T)) < 0)
-				log::cerr << "Shared data:" << std::endl << "ftruncate failed -> " << log::cerrno << std::endl;
+				debug::logErr << "Shared data:" << std::endl << "ftruncate failed -> " << debug::cerrno << std::endl;
 			if ((mode & O_WRONLY) > 0 || (mode & O_RDWR) > 0)
 				m_raw = mmap(NULL, sizeof(T), PROT_WRITE | PROT_READ, MAP_SHARED, m_fd, 0);
 			else
@@ -227,7 +227,7 @@ private:
 		} else {
 			m_fd = shm_open(m_name.data(), mode, PERM);
 			if (m_fd < 0)
-				log::cerr << "Shared data:" << std::endl << "shm_open failed -> " << log::cerrno << std::endl;
+				debug::logErr << "Shared data:" << std::endl << "shm_open failed -> " << debug::cerrno << std::endl;
 			if ((mode & O_WRONLY) > 0 || (mode & O_RDWR) > 0)
 				m_raw = mmap(NULL, sizeof(T), PROT_WRITE | PROT_READ, MAP_SHARED, m_fd, 0);
 			else

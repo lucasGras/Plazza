@@ -1,9 +1,9 @@
 #include "Log.hpp"
 
-namespace log {
+namespace debug {
 
-LogOstream cout(std::cout);
-LogOstream cerr(std::cerr);
+LogOstream logOut(std::cout);
+LogOstream logErr(std::cerr);
 
 LogOstream::LogOstream(const std::ostream &s)
 	: std::ostream(s.rdbuf())

@@ -23,6 +23,10 @@ extern "C" {
 #include "Abstractions/Channel.hpp"
 #include "Abstractions/LockingBool.hpp"
 #include "Abstractions/ExternLock.hpp"
+#include "Abstractions/DataQueue.hpp"
+#include "Abstractions/ThreadPool.hpp"
+
+#include "Debug/Log.hpp"
 
 static inline void sleepSecond(unsigned long s)
 {
@@ -42,20 +46,22 @@ void lel(LockingBool<> &b)
 	}
 }
 
-void *jeej(void *in)
+void jeej(Channel<int> c)
 {
-	pthread_mutex_t *m = (pthread_mutex_t *)in;
-	std::cout << pthread_mutex_trylock(m) << std::endl;
+	std::cout << c.pop() << std::endl;
+	std::cout << c.pop() << std::endl;
 	sleepSecond(2);
-	std::cout << pthread_mutex_trylock(m) << std::endl;
-	sleepSecond(2);
-	pthread_mutex_unlock(m);
-	return NULL;
+	std::cout << "waited 2 sec in jeej\n";
+	std::cout << c.pop() << std::endl;
+	std::cout << c.pop() << std::endl;
+	std::cout << c.pop() << std::endl;
+	std::cout << c.pop() << std::endl;
+
 }
 
 int main(int, char * const [])
 {
-
+	ThreadPool<int> p(2, 3, [](int &i) { std::cout << i << std::endl; });
 //	LockingBool<> kek = true;
 //
 //	Thread<void, LockingBool<> &> t(lel, kek);
@@ -68,13 +74,52 @@ int main(int, char * const [])
 //	kek = true;
 //	sleepSecond(2);
 //	t.cancel();
-	pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
-	pthread_t t;
 
-	pthread_create(&t, NULL, jeej, &m);
-	sleepSecond(1);
-	pthread_mutex_lock(&m);
-	std::cout << "lel" << std::endl;
-	pthread_join(t, NULL);
+//	Channel<int> c(3);
+//	Thread<void, Channel<int>> t(jeej, c);
+//
+//	c << 0;
+//	sleepSecond(2);
+//	std::cout << "waited 2 sec in main\n";
+//	c << 1;
+//
+//	c << 2;
+//	c << 3;
+//	c << 4;
+//	std::cout << "try push 5\n";
+//	c << 5;
+//	std::cout << "pushed 5\n";
+//
+//	t.join();
+//	int i = 0;
+//	auto ele = [&i]()
+//	{
+//		std::cout << i << std::endl;
+//		sleepSecond(2);
+//	};
+//	Worker w;
+//	w.setTask(ele);
+//	w.runNext();
+//	i++;
+//	w.setTask(ele);
+//	w.runNext();
+//	i++;
+//	w.setTask(ele);
+//	w.runNext();
+//	i++;
+//	w.setTask(ele);
+//	w.runNext();
+//	i++;
+//	w.runNext();
+	int i = 0;
+	while (i < 100) {
+		p.queueItem(rand());
+		p.queueItem(rand());
+		p.queueItem(rand());
+		p.queueItem(rand());
+		sleepSecond(1);
+		i++;
+	}
+
 	return 0;
 }
