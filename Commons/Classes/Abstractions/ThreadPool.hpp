@@ -28,12 +28,14 @@ public:
 	{
 		auto threadProc = [this]()
 		{
-			T obj;
+//			T obj;
 			while (!m_end) {
-				if (m_chan.tryPop(obj))
-					m_p(obj);
-				else
-					threadYield();
+				auto a = m_chan.pop();
+				m_p(a);
+//				if (m_chan.tryPop(obj))
+//					m_p(obj);
+//				else
+//					threadYield();
 			}
 		};
 
