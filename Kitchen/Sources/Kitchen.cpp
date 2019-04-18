@@ -8,8 +8,11 @@
 #include <iostream>
 #include <thread>
 #include <Pizza.hpp>
+#include <Kitchen.hpp>
+
 #include "Kitchen.hpp"
 #include "Abstractions/DataQueue.hpp"
+#include "Abstractions/Thread.hpp"
 #include "KitchenData.hpp"
 
 int main(int ac, char **av) {
@@ -22,16 +25,21 @@ int main(int ac, char **av) {
 }
 
 plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int multiplier)
-    : AKitchen(kitchenId, maxCooks, timeout, multiplier)
-{
-    std::thread thread([this]() {
-        while (true) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(this->getTimeout()));
-            this->refillStock();
-        }
-    });
-    thread.detach();
-}
+    : AKitchen(kitchenId, maxCooks, timeout, multiplier), _refillStockThread([this]() {
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(this->getTimeout()));
+        this->refillStock();
+    }
+}), _threadPool(this->getMaxCooks(), (this->getMaxCooks() * 2) - 1, [this](int &pizzaInt) {
+    plaz::Pizza pizza{};
+    PizzaManager pizzaManager;
+
+    pizza.unpack(pizzaInt);
+    (*this->getData())->availableCooks--;
+    pizza.consumePizza(this->getData());
+    std::this_thread::sleep_for(std::chrono::seconds(pizzaManager.getTimeOfCooking(pizza.getType()) * this->getMultiplier()));
+    (*this->getData())->availableCooks++;
+}) {}
 
 void plaz::kitchen::Kitchen::runQueueListen() {
     std::thread thread([this]() {
@@ -39,6 +47,7 @@ void plaz::kitchen::Kitchen::runQueueListen() {
             if ((*this->getData())->waitingPizza == -1
                 || (*this->getData())->availableCooks <= 0)
                 continue;
+            /*
             plaz::Pizza pizza{};
             pizza.unpack(((*this->getData())->waitingPizza));
             std::cout << "[KITCHEN] [DETECTED PIZZA (" << pizza.getType() << ") ] (" << this->getKitchenId() << ") : '" << (*this->getData())->waitingPizza << "'" << std::endl;
@@ -50,8 +59,13 @@ void plaz::kitchen::Kitchen::runQueueListen() {
                 (*this->getData())->availableCooks++;
             });
             thread.detach();
+             */
             (*this->getData())->waitingPizza = -1;
         }
     });
     thread.join();
+}
+
+plaz::kitchen::Kitchen::~Kitchen() {
+    this->_refillStockThread.cancel();
 }

@@ -197,7 +197,7 @@ private:
 		else
 			m_fd = mq_open(m_name.data(), mode);
 		//TODO(clément): check for invalid fd
-				mq_notify(m_fd, &E);
+				//mq_notify(m_fd, &E);
 
 	}
 private:
@@ -207,9 +207,9 @@ private:
 		.mq_msgsize = MAX_MSG_SIZE,
 		.mq_curmsgs = 0,
 	};
-	constexpr static struct sigevent E = {
+	/*constexpr static struct sigevent E = {
 		.sigev_notify = SIGEV_NONE,
-	};
+	};*/
 
 private:
 	char buff[MAX_MSG_SIZE];

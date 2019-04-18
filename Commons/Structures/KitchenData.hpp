@@ -8,19 +8,21 @@
 #ifndef PLAZZA_KITCHENDATA_HPP
 #define PLAZZA_KITCHENDATA_HPP
 
+#include <atomic>
+
 struct KitchenData {
-    int availableCooks;
-    int waitingPizza;
-    int maxCooks;
-    int stockDoe;
-    int stockTomato;
-    int stockGruyere;
-    int stockSteak;
-    int stockMushrooms;
-    int stockHam;
-    int stockEggPlant;
-    int stockGoatCheese;
-    int stockChiefLove;
+    std::atomic_int32_t availableCooks;
+    std::atomic_int32_t waitingPizza;
+    std::atomic_int32_t maxCooks;
+    std::atomic_int32_t stockDoe;
+    std::atomic_int32_t stockTomato;
+    std::atomic_int32_t stockGruyere;
+    std::atomic_int32_t stockSteak;
+    std::atomic_int32_t stockMushrooms;
+    std::atomic_int32_t stockHam;
+    std::atomic_int32_t stockEggPlant;
+    std::atomic_int32_t stockGoatCheese;
+    std::atomic_int32_t stockChiefLove;
 };
 
 #endif //PLAZZA_KITCHENDATA_HPP
