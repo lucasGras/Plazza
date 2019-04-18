@@ -19,7 +19,7 @@ int main(int ac, char **av) {
     if (ac != 5)
         return (84);
     // ARGS: ID - MaxCooks - TimeOut - Multiplier
-    std::cout << "[KITCHEN] Create kitchen " << std::atoi(av[1]) << std::endl;
+//    std::cout << "[KITCHEN] Create kitchen " << std::atoi(av[1]) << std::endl;
     plaz::kitchen::Kitchen kitchen(std::atoi(av[1]), std::atoi(av[2]), std::atoi(av[3]), std::atoi(av[4]));
     kitchen.runQueueListen();
     while (true);
@@ -35,12 +35,14 @@ plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int mu
     plaz::Pizza pizza{};
     PizzaManager pizzaManager;
 
-    pizza.unpack(pizzaInt);
+	std::cout << std::this_thread::get_id() << ": start pizza lel (" << pizzaInt << ")" << std::endl;
+	pizza.unpack(pizzaInt);
     pizza.consumePizza(this->getData());
     std::this_thread::sleep_for(std::chrono::seconds(pizzaManager.getTimeOfCooking(pizza.getType()) * this->getMultiplier()));
     (*this->getData())->availableCooks++;
-    std::cout << "finish pizza lel (" << pizzaInt << ")" << std::endl;
-}) {}
+    std::cout << std::this_thread::get_id() << ": finish pizza lel (" << pizzaInt << ")" << std::endl;
+})
+{}
 
 void plaz::kitchen::Kitchen::runQueueListen() {
     std::thread thread([this]() {
@@ -48,11 +50,9 @@ void plaz::kitchen::Kitchen::runQueueListen() {
             if ((*this->getData())->waitingPizza == -1
                 || (*this->getData())->availableCooks <= 0)
                 continue;
-            std::cout << "[KITCHEN] [NEW PIZZA] (" << this->getKitchenId() << ") : '" << (*this->getData())->waitingPizza << "'" << std::endl;
+//            std::cout << "[KITCHEN] [NEW PIZZA] (" << this->getKitchenId() << ") : '" << (*this->getData())->waitingPizza << "'" << std::endl;
             (*this->getData())->availableCooks--;
-            std::cout << "queue..." << std::endl;
             _threadPool.queueItem((*this->getData())->waitingPizza);
-            std::cout << "queue ok" << std::endl;
             (*this->getData())->waitingPizza = -1;
         }
     });

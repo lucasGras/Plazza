@@ -8,6 +8,8 @@
 #include "Mutex.hpp"
 
 #include <iostream> //TODO(clément): remove this
+#include <string>
+#include <thread>
 
 namespace plaz::abs {
 
@@ -41,7 +43,9 @@ bool Mutex::tryLock()
 
 void Mutex::lock()
 {
+	std::cout << std::this_thread::get_id() << ": \u001b[34m waiting lock \u001b[0m\n";
 	pthread_mutex_lock(&(m_m->m_m));
+	std::cout << std::this_thread::get_id() << ": \u001b[35m stop waiting lock \u001b[0m\n";
 }
 
 void Mutex::unlock()

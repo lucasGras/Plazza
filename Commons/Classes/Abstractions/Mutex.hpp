@@ -15,6 +15,8 @@ extern "C" {
 }
 
 #include <memory>
+#include <atomic>
+
 
 namespace plaz::abs {
 
