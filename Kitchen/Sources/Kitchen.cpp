@@ -22,6 +22,7 @@ int main(int ac, char **av) {
     std::cout << "[KITCHEN] Create kitchen " << std::atoi(av[1]) << std::endl;
     plaz::kitchen::Kitchen kitchen(std::atoi(av[1]), std::atoi(av[2]), std::atoi(av[3]), std::atoi(av[4]));
     kitchen.runQueueListen();
+    while (true);
 }
 
 plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int multiplier)
@@ -35,10 +36,10 @@ plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int mu
     PizzaManager pizzaManager;
 
     pizza.unpack(pizzaInt);
-    (*this->getData())->availableCooks--;
     pizza.consumePizza(this->getData());
     std::this_thread::sleep_for(std::chrono::seconds(pizzaManager.getTimeOfCooking(pizza.getType()) * this->getMultiplier()));
     (*this->getData())->availableCooks++;
+    std::cout << "finish pizza lel (" << pizzaInt << ")" << std::endl;
 }) {}
 
 void plaz::kitchen::Kitchen::runQueueListen() {
@@ -47,23 +48,15 @@ void plaz::kitchen::Kitchen::runQueueListen() {
             if ((*this->getData())->waitingPizza == -1
                 || (*this->getData())->availableCooks <= 0)
                 continue;
-            /*
-            plaz::Pizza pizza{};
-            pizza.unpack(((*this->getData())->waitingPizza));
-            std::cout << "[KITCHEN] [DETECTED PIZZA (" << pizza.getType() << ") ] (" << this->getKitchenId() << ") : '" << (*this->getData())->waitingPizza << "'" << std::endl;
+            std::cout << "[KITCHEN] [NEW PIZZA] (" << this->getKitchenId() << ") : '" << (*this->getData())->waitingPizza << "'" << std::endl;
             (*this->getData())->availableCooks--;
-            pizza.consumePizza(this->getData());
-            std::thread thread([this, pizza]() {
-                PizzaManager pizzaManager;
-                std::this_thread::sleep_for(std::chrono::seconds(pizzaManager.getTimeOfCooking(pizza.getType()) * this->getMultiplier()));
-                (*this->getData())->availableCooks++;
-            });
-            thread.detach();
-             */
+            std::cout << "queue..." << std::endl;
+            _threadPool.queueItem((*this->getData())->waitingPizza);
+            std::cout << "queue ok" << std::endl;
             (*this->getData())->waitingPizza = -1;
         }
     });
-    thread.join();
+    thread.detach();
 }
 
 plaz::kitchen::Kitchen::~Kitchen() {
