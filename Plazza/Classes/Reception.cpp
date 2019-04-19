@@ -5,6 +5,8 @@
 ** Created by lucasg,
 */
 
+#include <Abstractions/Mutex.hpp>
+#include <fstream>
 #include "Reception.hpp"
 #include "PlazzaServerAPIManager.hpp"
 
@@ -18,6 +20,12 @@ static inline void rtrim(std::string &s) {
     s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
         return !std::isspace(ch);
     }).base(), s.end());
+}
+
+static bool is_number(const std::string& s)
+{
+    return !s.empty() && std::find_if(s.begin(),
+            s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 }
 
 static std::vector<std::string> split(const std::string &s, char delim) {
@@ -37,6 +45,38 @@ plaz::Reception::Reception(const std::string &multiplier, const std::string &coo
     this->_multiplier = std::stoi(multiplier);
     this->_cooksNumber = std::stoi(cooks);
     this->_kitchenStockTimeout = std::stoi(kitchen);
+    //this->_mutex = new plaz::abs::Mutex();
+    this->_logThread = new plaz::abs::Thread<void>([this]() {
+        plaz::abs::DataQueue<> queue("/plazzaLog", plaz::abs::DataQueue<>::Mode::Read, true);
+        /*
+        std::ofstream logFile;
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        std::ostringstream oss;
+
+        oss << std::put_time(&tm, "_%d-%m-%Y_%H-%M-%S");
+        logFile.open("logs/plazza" + oss.str());*/
+        while (true) {
+            auto id = queue.pull();
+
+      //      this->_mutex->lock();
+      /*
+           if (is_number(id)) {
+                logFile << id;
+                continue;
+            }*/
+            for (auto &[kitchen, process] : this->_kitchens) {
+                (void)process;
+                if (kitchen->getKitchenId() == std::atoi(id.c_str())) {
+                    std::cout << "Kitchen " << id << " just closed" << std::endl;
+                    this->_kitchens.erase(kitchen);
+                    break;
+                }
+            }
+        //    this->_mutex->unlock();
+        }
+        //logFile.close();
+    });
 }
 
 void plaz::Reception::receiveOrders() {
@@ -76,7 +116,6 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
                 continue;
             auto sended = order.getPizza().pack();
             auto kitchen = getAvailableKitchen(order.getPizza());
-//            std::cout << "[RECEPTION] Send pizza in kitchen (" << kitchen->getKitchenId() << ")" << std::endl;
             (*kitchen->getData())->waitingPizza = sended;
             while ((*kitchen->getData())->waitingPizza != -1);
         }
@@ -86,10 +125,6 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
 plaz::AKitchen *plaz::Reception::getAvailableKitchen(plaz::Pizza pizza) {
     for (auto &[kitchen, process] : this->_kitchens) {
         (void)process;
-        if (!(*kitchen->getData())->alive) {
-            this->_kitchens.erase(kitchen);
-            continue;
-        }
         if ((*kitchen->getData())->availableCooks <= 0 || (*kitchen->getData())->waitingPizza != -1)
             continue;
         if (pizza.checkCanConsumePizza(kitchen->getData())) {
@@ -102,12 +137,12 @@ plaz::AKitchen *plaz::Reception::getAvailableKitchen(plaz::Pizza pizza) {
 plaz::AKitchen *plaz::Reception::initNewKitchen() {
     auto *kitchen = new plaz::AKitchen(this->_kitchens.size() + 1, this->_cooksNumber, this->_kitchenStockTimeout, this->_multiplier);
     auto *process = new plaz::abs::Process();
-    std::vector<std::string_view> args{std::to_string(kitchen->getKitchenId()), std::to_string(this->_cooksNumber), std::to_string(this->_kitchenStockTimeout), std::to_string(this->_multiplier)};
+    std::vector<std::string_view> args{std::to_string(kitchen->getKitchenId()), std::to_string(this->_cooksNumber),
+                                       std::to_string(this->_kitchenStockTimeout), std::to_string(this->_multiplier)};
     std::vector<std::string_view> env;
 
     kitchen->initKitchen();
     this->_kitchens.emplace(kitchen, process);
-//    std::cout << "[RECEPTION] Create new kitchen (" << kitchen->getKitchenId() << ")" << std::endl;
     process->exec(std::string_view("./kitchen"), args, env);
     return (kitchen);
 }
@@ -127,10 +162,6 @@ int plaz::Reception::getKitchenStockTimeout() {
 void plaz::Reception::status() {
     for (auto &[kitchen, process] : this->_kitchens) {
         (void) process;
-        if (!(*kitchen->getData())->alive) {
-            this->_kitchens.erase(kitchen);
-            continue;
-        }
         auto str = std::string("---- Kitchen " + std::to_string(kitchen->getKitchenId()) + "----");
 
         std::cout << str << std::endl;

@@ -28,6 +28,7 @@ namespace plaz::kitchen {
 	private:
 		plaz::abs::Thread<void> _refillStockThread;
 		plaz::abs::ThreadPool<int> _threadPool;
+		plaz::abs::DataQueue<> _queue;
 	};
 }
 #endif //PLAZZA_KITCHEN_HPP

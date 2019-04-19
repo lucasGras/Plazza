@@ -14,6 +14,7 @@
 #include <thread>
 #include <Order.hpp>
 #include <AKitchen.hpp>
+#include <iomanip>
 #include "Abstractions/DataQueue.hpp"
 #include "Abstractions/Process.hpp"
 #include "Abstractions/SharedData.hpp"
@@ -47,6 +48,7 @@ namespace plaz {
         int _kitchenStockTimeout;
         std::map<plaz::AKitchen*, plaz::abs::Process*> _kitchens;
         bool serverMode;
+        plaz::abs::Thread<void> *_logThread;
     };
 }
 

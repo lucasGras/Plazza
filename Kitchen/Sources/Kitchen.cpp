@@ -19,7 +19,6 @@ int main(int ac, char **av) {
     if (ac != 5)
         return (84);
     // ARGS: ID - MaxCooks - TimeOut - Multiplier
-//    std::cout << "[KITCHEN] Create kitchen " << std::atoi(av[1]) << std::endl;
     plaz::kitchen::Kitchen kitchen(std::atoi(av[1]), std::atoi(av[2]), std::atoi(av[3]), std::atoi(av[4]));
     kitchen.runQueueListen();
     while (true);
@@ -41,7 +40,8 @@ plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int mu
     std::this_thread::sleep_for(std::chrono::seconds(pizzaManager.getTimeOfCooking(pizza.getType()) * this->getMultiplier()));
     (*this->getData())->availableCooks++;
     std::cout << std::this_thread::get_id() << ": finish pizza lel (" << pizzaInt << ")" << std::endl;
-})
+    //this->_queue.push("Kitchen " + std::to_string(this->getKitchenId()) + " : " + std::to_string(pizzaInt));
+}), _queue("/plazzaLog", plaz::abs::DataQueue<>::Mode::Write)
 {}
 
 void plaz::kitchen::Kitchen::runQueueListen() {
@@ -52,16 +52,14 @@ void plaz::kitchen::Kitchen::runQueueListen() {
             int elapsed_seconds = static_cast<int>(std::chrono::duration_cast<std::chrono::seconds>(
                     std::chrono::system_clock::now() - start).count());
 
-            //std::cout << "Kitchen waits since " << elapsed_seconds << " seconds" << std::endl;
             if (elapsed_seconds >= 5) {
-                (*this->getData())->alive = false;
-                std::exit(0);
+                this->_queue.push(std::to_string(this->getKitchenId()));
+                exit(0);
             }
             if ((*this->getData())->waitingPizza == -1
                 || (*this->getData())->availableCooks <= 0)
                 continue;
             start = std::chrono::system_clock::now();
-//            std::cout << "[KITCHEN] [NEW PIZZA] (" << this->getKitchenId() << ") : '" << (*this->getData())->waitingPizza << "'" << std::endl;
             (*this->getData())->availableCooks--;
             _threadPool.queueItem((*this->getData())->waitingPizza);
             (*this->getData())->waitingPizza = -1;

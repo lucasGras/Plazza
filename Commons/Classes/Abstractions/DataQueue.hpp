@@ -21,6 +21,8 @@ extern "C" {
 #include <string>
 #include <string_view>
 
+#include <iostream> //TODO(clément): remove this
+
 namespace plaz::abs {
 
 template<std::size_t MAX_MSG_SIZE = 1024, std::size_t MAX_MSG = 10, int PERM = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IROTH>
@@ -190,12 +192,11 @@ public:
 private:
 	void init(int mode)
 	{
-		//
-
 		if ((mode & O_CREAT) > 0)
 			m_fd = mq_open(m_name.data(), mode, PERM, &A);
 		else
 			m_fd = mq_open(m_name.data(), mode);
+
 		//TODO(clément): check for invalid fd
 				//mq_notify(m_fd, &E);
 
