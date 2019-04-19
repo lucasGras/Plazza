@@ -15,6 +15,8 @@ extern "C" {
 }
 
 #include <memory>
+#include <atomic>
+
 
 namespace plaz::abs {
 
@@ -22,7 +24,7 @@ class Mutex {
 public:
 	Mutex();
 	Mutex(const Mutex &m);
-	Mutex(Mutex &&m);
+	Mutex(Mutex &&m) noexcept;
 	~Mutex();
 
 	bool tryLock();

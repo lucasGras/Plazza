@@ -17,6 +17,8 @@
 
 #include "Thread.hpp"
 #include "Mutex.hpp"
+#include "LockingBool.hpp"
+
 
 namespace plaz::abs {
 
@@ -31,12 +33,12 @@ public:
 	}
 
 	Channel(const Channel &c)
-		: m_s(c.m_s), m_m(c.m_m), m_l(c.m_l)
+		: m_s(c.m_s), m_m(c.m_m), m_l(c.m_l), m_empty(c.m_empty), m_filled(c.m_filled)
 	{
 	}
 
 	Channel(Channel &&c) noexcept
-		: m_s(c.m_s), m_m(std::move(c.m_m)), m_l(std::move(c.m_l))
+		: m_s(c.m_s), m_m(c.m_m), m_l(c.m_l), m_empty(c.m_empty), m_filled(c.m_filled)
 	{
 	}
 
@@ -48,7 +50,7 @@ public:
 
 	Channel &operator <<(T &&obj)
 	{
-		push(obj);
+		push(std::move(obj));
 
 		return *this;
 	}
@@ -62,14 +64,15 @@ public:
 
 	void push(T &&obj)
 	{
-		//TODO(clément): replace this with a conditional variable
-		while (isFilled())
-			threadYield();
+		m_filled.waitUntilValid();
 
 		m_l.lock();
 		m_m->m_q.push(obj);
 		m_l.unlock();
 		m_m->m_c++;
+
+		m_filled = isFilled();
+		m_empty = isEmpty();
 	}
 
 	inline bool tryPush(T &&obj)
@@ -82,16 +85,17 @@ public:
 
 	T pop()
 	{
-		//TODO(clément): replace this with a conditional variable
-
-		while (isEmpty())
-			threadYield();
+		m_empty.waitUntilValid();
 
 		m_l.lock();
 		T temp = m_m->m_q.front();
 		m_m->m_q.pop();
 		m_l.unlock();
 		m_m->m_c--;
+
+		m_filled = isFilled();
+		m_empty = isEmpty();
+
 		return std::move(temp);
 	}
 
@@ -113,9 +117,6 @@ public:
 		return m_m->m_c == 0;
 	}
 private:
-	void waitUntilNotEmpty() const;
-	void waitUntilNotFilled() const;
-private:
 	struct Members {
 		std::atomic_uint64_t m_c;
 		std::queue<T> m_q;
@@ -123,8 +124,10 @@ private:
 	using SharedMem = const std::shared_ptr<Members>;
 private:
 	const std::size_t m_s = 1;
-	Mutex m_l;
 	SharedMem m_m = nullptr;
+	Mutex m_l;
+	LockingBool<false> m_empty = true;
+	LockingBool<false> m_filled = false;
 };
 
 }

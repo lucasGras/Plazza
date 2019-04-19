@@ -20,7 +20,9 @@ namespace plaz::server {
         for (auto &kitchen : runningKitchens) {
             plaz::server::paquet_t paquet = {
                     kitchen->getKitchenId(),
+                    (*kitchen->getData())->maxCooks,
                     (*kitchen->getData())->availableCooks,
+                    (*kitchen->getData())->waitingPizza,
                     (*kitchen->getData())->stockDoe,
                     (*kitchen->getData())->stockTomato,
                     (*kitchen->getData())->stockGruyere,
@@ -29,7 +31,7 @@ namespace plaz::server {
                     (*kitchen->getData())->stockHam,
                     (*kitchen->getData())->stockEggPlant,
                     (*kitchen->getData())->stockGoatCheese,
-                    (*kitchen->getData())->stockChiefLove,
+                    (*kitchen->getData())->stockChiefLove
             };
 
             runningKitchensData.push_back(paquet);
@@ -86,7 +88,9 @@ namespace plaz::server {
      */
     void to_json(nlohmann::json &j, const paquet_t &value) {
         j["id"] = value.id;
+        j["max_cooks"] = value.max_cooks;
         j["available_cooks"] = value.available_cooks;
+        j["waiting_pizza"] = value.waiting_pizza;
         j["doe"] = value.stockDoe;
         j["tomato"] = value.stockTomato;
         j["gruyere"] = value.stockGruyere;
@@ -102,7 +106,7 @@ namespace plaz::server {
         auto runningKitchensData = getRunningKitchensData(runningKitchens);
         nlohmann::json json = runningKitchensData;
 
-        if (makeHttpRequest<int>("http://51.77.211.78:" + std::to_string(PLAZZA_SERVER_PORT) + "/refresh?json=" + json.dump()) != 0)
+        if (makeHttpRequest<int>("http://51.77.211.78:" + std::to_string(PLAZZA_SERVER_PORT) + "/refresh/shared?json=" + json.dump()) != 0)
             std::cerr << "Error making http request" << std::endl;
     }
 
@@ -125,6 +129,7 @@ namespace plaz::server {
                 while (true) {
                     reception->sendOrders(this->getOrders());
                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                    this->refreshReception(reception->getRunningKitchens());
                 }
             });
             serverThread.detach();

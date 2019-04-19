@@ -33,7 +33,7 @@ router.get('/orders', function(req, res) {
     if (!req.query.json) {
         res.send({"error": "invalid query parameter"}).status(500);
     } else {
-        let jsonData = {};
+        let jsonData = [];
 
         try {
             jsonData = JSON.parse(req.query.json);

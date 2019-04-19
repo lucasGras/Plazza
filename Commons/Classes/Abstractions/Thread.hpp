@@ -67,17 +67,22 @@ public:
 		pthread_create(&m_t, NULL, procImpl, &m_procArgs);
 	}
 
-	~ThreadImpl() = default;
+	~ThreadImpl()
+	{
+		if (!m_running)
+			pthread_join(m_t, NULL);
+	}
 
 	ThreadImpl(const ThreadImpl &) = delete;
 	ThreadImpl(ThreadImpl &&) = delete;
 
 	void cancel()
 	{
-
-		pthread_cancel(m_t);
-		pthread_join(m_t, NULL);
-		m_running = false;
+		if (m_running) {
+			pthread_cancel(m_t);
+			pthread_join(m_t, NULL);
+			m_running = false;
+		}
 	}
 
 	void join()
@@ -129,7 +134,7 @@ private:
 	};
 public:
 	ThreadImpl() = delete;
-	ThreadImpl(Procedure p, ARGS &&... args)
+	ThreadImpl(Procedure p, ARGS... args)
 	{
 		auto procImpl = [](void *a) -> void * {
 			ProcArgs *procArgs = static_cast<ProcArgs *>(a);
@@ -150,7 +155,11 @@ public:
 		pthread_create(&m_t, NULL, procImpl, &m_procArgs);
 	}
 
-	~ThreadImpl() = default;
+	~ThreadImpl()
+	{
+		if (!m_running)
+			pthread_join(m_t, NULL);
+	}
 
 	ThreadImpl(const ThreadImpl &) = delete;
 	ThreadImpl(ThreadImpl &&) = delete;
@@ -188,6 +197,7 @@ public:
 	ThreadImpl &operator =(ThreadImpl &&) = delete;
 private:
 	pthread_t m_t;
+	//TODO(clément): optimise those two in one
 	std::atomic_bool m_running = false;
 	std::atomic_bool m_returned = false;
 	ProcArgs m_procArgs;

@@ -4,8 +4,9 @@
 ** File description:
 ** Created by lucasg,
 */
-#include "Reception.hpp"
 
+#include "Reception.hpp"
+#include "PlazzaServerAPIManager.hpp"
 
 static inline void ltrim(std::string &s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
@@ -65,6 +66,7 @@ void plaz::Reception::serverModeReception() {
         if (line == "exit")
             break;
     }
+    this->quit();
 }
 
 void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
@@ -74,7 +76,7 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
                 continue;
             auto sended = order.getPizza().pack();
             auto kitchen = getAvailableKitchen(order.getPizza());
-            std::cout << "[RECEPTION] Send pizza in kitchen (" << kitchen->getKitchenId() << ")" << std::endl;
+//            std::cout << "[RECEPTION] Send pizza in kitchen (" << kitchen->getKitchenId() << ")" << std::endl;
             (*kitchen->getData())->waitingPizza = sended;
             while ((*kitchen->getData())->waitingPizza != -1);
         }
@@ -83,10 +85,10 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
 
 plaz::AKitchen *plaz::Reception::getAvailableKitchen(plaz::Pizza pizza) {
     for (auto &[kitchen, process] : this->_kitchens) {
-        (void)process;
-        if ((*kitchen->getData())->waitingPizza != -1)
-            continue;
+        (void) process;
         if ((*kitchen->getData())->availableCooks <= 0)
+            continue;
+        if ((*kitchen->getData())->waitingPizza != -1)
             continue;
         if (pizza.checkCanConsumePizza(kitchen->getData())) {
             return kitchen;
@@ -103,7 +105,7 @@ plaz::AKitchen *plaz::Reception::initNewKitchen() {
 
     kitchen->initKitchen();
     this->_kitchens.emplace(kitchen, process);
-    std::cout << "[RECEPTION] Create new kitchen (" << kitchen->getKitchenId() << ")" << std::endl;
+//    std::cout << "[RECEPTION] Create new kitchen (" << kitchen->getKitchenId() << ")" << std::endl;
     process->exec(std::string_view("./kitchen"), args, env);
     return (kitchen);
 }
@@ -122,7 +124,7 @@ int plaz::Reception::getKitchenStockTimeout() {
 
 void plaz::Reception::status() {
     for (auto &[kitchen, process] : this->_kitchens) {
-        (void)process;
+        (void) process;
         auto str = std::string("---- Kitchen " + std::to_string(kitchen->getKitchenId()) + "----");
 
         std::cout << str << std::endl;
@@ -143,7 +145,7 @@ void plaz::Reception::status() {
 
 void plaz::Reception::quit() {
     for (auto &[kitchen, process] : this->_kitchens) {
-        (void)kitchen;
+        (void) kitchen;
         process->kill();
     }
 }
@@ -152,7 +154,7 @@ std::vector<plaz::AKitchen *> plaz::Reception::getRunningKitchens() const {
     std::vector<plaz::AKitchen *> runningKitchens;
 
     for (auto &[kitchen, process] : this->_kitchens) {
-        (void)process;
+        (void) process;
         runningKitchens.push_back(kitchen);
     }
     return runningKitchens;

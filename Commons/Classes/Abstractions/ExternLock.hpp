@@ -20,7 +20,7 @@ class ExternLock {
 public:
 	ExternLock();
 	ExternLock(const ExternLock &l);
-	ExternLock(ExternLock &&l);
+	ExternLock(ExternLock &&l) noexcept;
 	~ExternLock();
 
 	void unlockOne();
