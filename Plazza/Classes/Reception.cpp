@@ -46,25 +46,11 @@ plaz::Reception::Reception(const std::string &multiplier, const std::string &coo
     this->_cooksNumber = std::stoi(cooks);
     this->_kitchenStockTimeout = std::stoi(kitchen);
     //this->_mutex = new plaz::abs::Mutex();
-    this->_logThread = new plaz::abs::Thread<void>([this]() {
-        plaz::abs::DataQueue<> queue("/plazzaLog", plaz::abs::DataQueue<>::Mode::Read, true);
-        /*
-        std::ofstream logFile;
-        auto t = std::time(nullptr);
-        auto tm = *std::localtime(&t);
-        std::ostringstream oss;
-
-        oss << std::put_time(&tm, "_%d-%m-%Y_%H-%M-%S");
-        logFile.open("logs/plazza" + oss.str());*/
+    this->_timeoutThread = new plaz::abs::Thread<void>([this]() {
+        plaz::abs::DataQueue<> queue("/plazzaTimeout", plaz::abs::DataQueue<>::Mode::Read, true);
         while (true) {
             auto id = queue.pull();
 
-      //      this->_mutex->lock();
-      /*
-           if (is_number(id)) {
-                logFile << id;
-                continue;
-            }*/
             for (auto &[kitchen, process] : this->_kitchens) {
                 (void)process;
                 if (kitchen->getKitchenId() == std::atoi(id.c_str())) {
@@ -73,10 +59,24 @@ plaz::Reception::Reception(const std::string &multiplier, const std::string &coo
                     break;
                 }
             }
-        //    this->_mutex->unlock();
         }
-        //logFile.close();
     });
+    /*
+    this->_logThread = new plaz::abs::Thread<void>([this]() {
+        plaz::abs::DataQueue<> queue("/plazzaLog", plaz::abs::DataQueue<>::Mode::Read, true);
+        std::ofstream logFile;
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        std::ostringstream oss;
+
+        oss << std::put_time(&tm, "_%d%m%Y_%H%M%S");
+        logFile.open("logs/plazza" + oss.str());
+        while (true) {
+            auto msg = queue.pull();
+            logFile << msg;
+        }
+    });
+     */
 }
 
 void plaz::Reception::receiveOrders() {

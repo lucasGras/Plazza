@@ -48,6 +48,7 @@ namespace plaz {
         int _kitchenStockTimeout;
         std::map<plaz::AKitchen*, plaz::abs::Process*> _kitchens;
         bool serverMode;
+        plaz::abs::Thread<void> *_timeoutThread;
         plaz::abs::Thread<void> *_logThread;
     };
 }
