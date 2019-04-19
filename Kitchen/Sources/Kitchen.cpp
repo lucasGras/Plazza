@@ -46,10 +46,21 @@ plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int mu
 
 void plaz::kitchen::Kitchen::runQueueListen() {
     std::thread thread([this]() {
+        auto start = std::chrono::system_clock::now();
+
         while (true) {
+            int elapsed_seconds = static_cast<int>(std::chrono::duration_cast<std::chrono::seconds>(
+                    std::chrono::system_clock::now() - start).count());
+
+            //std::cout << "Kitchen waits since " << elapsed_seconds << " seconds" << std::endl;
+            if (elapsed_seconds >= 5) {
+                (*this->getData())->alive = false;
+                std::exit(0);
+            }
             if ((*this->getData())->waitingPizza == -1
                 || (*this->getData())->availableCooks <= 0)
                 continue;
+            start = std::chrono::system_clock::now();
 //            std::cout << "[KITCHEN] [NEW PIZZA] (" << this->getKitchenId() << ") : '" << (*this->getData())->waitingPizza << "'" << std::endl;
             (*this->getData())->availableCooks--;
             _threadPool.queueItem((*this->getData())->waitingPizza);
