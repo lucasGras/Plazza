@@ -16,6 +16,13 @@
 #include "Mutex.hpp"
 #include "Channel.hpp"
 
+#include "Pizza.hpp"
+#include <chrono>
+#include <ctime>
+
+#include <fstream>
+#include <sstream>
+
 namespace plaz::abs {
 
 template<typename T>
@@ -26,16 +33,20 @@ public:
 	ThreadPool(std::size_t poolSize, std::size_t queueSize, const Procedure &p)
 		: m_chan(queueSize), m_p(p)
 	{
+		std::cout << "create thread pool in process " << debug::pid << std::endl;
+
 		auto threadProc = [this]()
 		{
 //			T obj;
 			while (!m_end) {
-				auto a = m_chan.pop();
-				m_p(a);
-//				if (m_chan.tryPop(obj))
-//					m_p(obj);
-//				else
-//					threadYield();
+//				auto a = m_chan.pop();
+
+//				m_p(a);
+				T obj;
+				if (m_chan.tryPop(obj))
+					m_p(obj);
+				else
+					threadYield();
 			}
 		};
 

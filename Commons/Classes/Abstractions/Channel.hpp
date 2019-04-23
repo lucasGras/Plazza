@@ -69,6 +69,7 @@ public:
 		m_l.lock();
 		m_m->m_q.push(obj);
 		m_l.unlock();
+
 		m_m->m_c++;
 
 		m_filled = isFilled();
@@ -77,10 +78,19 @@ public:
 
 	inline bool tryPush(T &&obj)
 	{
-		if (isFilled())
-			return false;
-		push(obj);
-		return true;
+//		if (isFilled())
+//			return false;
+//		push(obj);
+
+		if (!m_filled) {
+			m_l.lock();
+			obj = m_m->m_q.push(obj);
+			m_l.unlock();
+
+			return true;
+		}
+
+		return false;
 	}
 
 	T pop()
@@ -95,16 +105,25 @@ public:
 
 		m_filled = isFilled();
 		m_empty = isEmpty();
-
 		return std::move(temp);
 	}
 
 	inline bool tryPop(T &obj)
 	{
-		if (isEmpty())
-			return false;
-		obj = pop();
-		return true;
+//		if (isEmpty())
+//			return false;
+//		obj = pop();
+//		return true;
+		if (!m_empty) {
+			m_l.lock();
+			obj = m_m->m_q.front();
+			m_m->m_q.pop();
+			m_l.unlock();
+
+			return true;
+		}
+
+		return false;
 	}
 
 	inline bool isFilled() const noexcept
