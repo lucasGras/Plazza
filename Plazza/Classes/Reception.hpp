@@ -15,6 +15,7 @@
 #include <Order.hpp>
 #include <AKitchen.hpp>
 #include <iomanip>
+#include <fstream>
 #include "Abstractions/DataQueue.hpp"
 #include "Abstractions/Process.hpp"
 #include "Abstractions/SharedData.hpp"
@@ -50,6 +51,7 @@ namespace plaz {
         bool serverMode;
         plaz::abs::Thread<void> *_timeoutThread;
         plaz::abs::Thread<void> *_logThread;
+        std::ofstream _logFile;
     };
 }
 

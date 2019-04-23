@@ -6,7 +6,6 @@
 */
 
 #include <Abstractions/Mutex.hpp>
-#include <fstream>
 #include "Reception.hpp"
 #include "PlazzaServerAPIManager.hpp"
 
@@ -41,7 +40,9 @@ static std::vector<std::string> split(const std::string &s, char delim) {
     return result;
 }
 
-plaz::Reception::Reception(const std::string &multiplier, const std::string &cooks, const std::string &kitchen) {
+plaz::Reception::Reception(const std::string &multiplier, const std::string &cooks, const std::string &kitchen)
+    : _logFile("plazza-log.txt", std::ios_base::app)
+{
     this->_multiplier = std::stoi(multiplier);
     this->_cooksNumber = std::stoi(cooks);
     this->_kitchenStockTimeout = std::stoi(kitchen);
@@ -61,22 +62,16 @@ plaz::Reception::Reception(const std::string &multiplier, const std::string &coo
             }
         }
     });
-    /*
     this->_logThread = new plaz::abs::Thread<void>([this]() {
         plaz::abs::DataQueue<> queue("/plazzaLog", plaz::abs::DataQueue<>::Mode::Read, true);
-        std::ofstream logFile;
-        auto t = std::time(nullptr);
-        auto tm = *std::localtime(&t);
-        std::ostringstream oss;
 
-        oss << std::put_time(&tm, "_%d%m%Y_%H%M%S");
-        logFile.open("logs/plazza" + oss.str());
         while (true) {
             auto msg = queue.pull();
-            logFile << msg;
+
+            std::cout << "LogThread: " << msg << std::endl;
+            this->_logFile << msg + "\n";
         }
     });
-     */
 }
 
 void plaz::Reception::receiveOrders() {
@@ -185,6 +180,7 @@ void plaz::Reception::quit() {
         (void) kitchen;
         process->kill();
     }
+    this->_logFile.close();
 }
 
 std::vector<plaz::AKitchen *> plaz::Reception::getRunningKitchens() const {
