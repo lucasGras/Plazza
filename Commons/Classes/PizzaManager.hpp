@@ -60,7 +60,7 @@ namespace plaz {
         };
         std::map<PizzaType, int> _timesOfPizza = {
                 { Regina, 1 },
-                { Regina, 2 },
+                { Margarita, 2 },
                 { Americana, 2 },
                 { Fantasia, 4 },
         };
