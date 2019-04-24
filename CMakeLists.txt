@@ -12,6 +12,16 @@ SET(COMMON_HEADERS
         "Commons/Classes"
         "Commons/Structures")
 
+ADD_CUSTOM_TARGET(curl_unzip ALL
+        COMMAND COMMAND ${CMAKE_COMMAND} -E remove_directory Vendor/curl
+        COMMAND COMMAND ${CMAKE_COMMAND} -E tar xzf ${CMAKE_CURRENT_LIST_DIR}/Vendor/curl.zip
+        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/Vendor
+        BYPRODUCTS "${CMAKE_CURRENT_LIST_DIR}/Vendor/curl"
+        COMMENT "Unpacking static libcurl"
+        VERBATIM
+        )
+LINK_DIRECTORIES(Vendor/curl)
+
 FILE(GLOB_RECURSE SRCS_PLAZZA "Plazza/Sources/*.cpp")
 FILE(GLOB_RECURSE CLASSES_PLAZZA "Plazza/Classes/*.cpp")
 
@@ -23,8 +33,10 @@ TARGET_INCLUDE_DIRECTORIES(plazza PRIVATE
         ${COMMON_HEADERS}
         Plazza/Headers
         Plazza/Classes
+        Vendor/curl
 )
 TARGET_LINK_LIBRARIES(plazza PRIVATE pthread rt curl)
+ADD_DEPENDENCIES(plazza curl_unzip)
 TARGET_COMPILE_OPTIONS(plazza PRIVATE ${FLAG})
 SET_TARGET_PROPERTIES(plazza PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
 
