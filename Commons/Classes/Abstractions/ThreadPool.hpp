@@ -31,27 +31,30 @@ public:
 	using Procedure = std::function<void(T &)>;
 public:
 	ThreadPool(std::size_t poolSize, std::size_t queueSize, const Procedure &p)
-		: m_chan(queueSize), m_p(p)
+		: m_p(p)
 	{
-		std::cout << "create thread pool in process " << debug::pid << std::endl;
-
 		auto threadProc = [this]()
 		{
-//			T obj;
 			while (!m_end) {
-//				auto a = m_chan.pop();
-
-//				m_p(a);
-				T obj;
-				if (m_chan.tryPop(obj))
-					m_p(obj);
-				else
-					threadYield();
+                if (m_q.size() == 0) {
+                    threadYield();
+                    continue;
+                }
+                m_m.lock();
+                if (m_q.size() > 0) {
+                    T element = m_q.front();
+                    m_q.pop();
+                    m_m.unlock();
+                    m_p(element);
+                } else
+                    m_m.unlock();
 			}
 		};
-
-		for (std::size_t i = 0; i < poolSize; i++)
-			m_threads.push_back(new Thread<void>(threadProc));
+		for (std::size_t i = 0; i < poolSize; i++) {
+            auto t = new Thread<void>(threadProc);
+            t->detach();
+            m_threads.push_back(t);
+        }
 	}
 
 	ThreadPool(const ThreadPool &) = delete;
@@ -68,13 +71,14 @@ public:
 
 	void queueItem(T &&obj)
 	{
-		m_chan.push(std::move(obj));
+		m_q.push(std::move(obj));
 	}
 private:
 	std::atomic_bool m_end = false;
 	std::vector<Thread<void> *> m_threads;
 	Procedure m_p;
-	Channel<T> m_chan;
+    Mutex m_m;
+	std::queue<T> m_q;
 };
 
 }

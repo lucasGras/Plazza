@@ -61,6 +61,7 @@ void plaz::kitchen::Kitchen::runQueueListen() {
                 continue;
             start = std::chrono::system_clock::now();
             (*this->getData())->availableCooks--;
+            std::cout << "adding item in queue" << std::endl;
             _threadPool.queueItem((*this->getData())->waitingPizza);
             (*this->getData())->waitingPizza = -1;
         }
