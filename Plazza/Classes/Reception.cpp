@@ -120,7 +120,8 @@ void plaz::Reception::sendOrders(std::vector<plaz::Order> orders) {
 plaz::AKitchen *plaz::Reception::getAvailableKitchen(plaz::Pizza pizza) {
     for (auto &[kitchen, process] : this->_kitchens) {
         (void)process;
-        if ((*kitchen->getData())->availableCooks <= 0 || (*kitchen->getData())->waitingPizza != -1)
+        if ((*kitchen->getData())->availableSlots <= 0
+            || (*kitchen->getData())->waitingPizza != -1)
             continue;
         if (pizza.checkCanConsumePizza(kitchen->getData())) {
             return kitchen;
@@ -170,7 +171,7 @@ void plaz::Reception::status() {
         std::cout << "\tEggPlant:" << (*kitchen->getData())->stockEggPlant << std::endl;
         std::cout << "\tGoatCheese:" << (*kitchen->getData())->stockGoatCheese << std::endl;
         std::cout << "\tChiefLove:" << (*kitchen->getData())->stockChiefLove << std::endl;
-        std::cout << "Free chiefs: " << (*kitchen->getData())->availableCooks << " / " << this->_cooksNumber << std::endl;
+        std::cout << "Free chiefs: " << (*kitchen->getData())->availableSlots << " / " << this->_cooksNumber << std::endl;
         std::cout << std::string(str.length(), '-') << std::endl;
     }
 }

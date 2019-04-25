@@ -30,7 +30,7 @@ plaz::abs::DataQueue<> *plaz::AKitchen::getQueue() {
 }
 
 void plaz::AKitchen::initKitchen() {
-    (*this->getData())->availableCooks = this->getMaxCooks();
+    (*this->getData())->availableSlots = this->getMaxSlots();
     (*this->getData())->waitingPizza = -1;
     (*this->getData())->stockHam = 5;
     (*this->getData())->stockDoe = 5;
@@ -41,8 +41,6 @@ void plaz::AKitchen::initKitchen() {
     (*this->getData())->stockEggPlant = 5;
     (*this->getData())->stockGoatCheese = 5;
     (*this->getData())->stockChiefLove = 5;
-    (*this->getData())->maxCooks = this->getMaxCooks();
-    (*this->getData())->alive = true;
 }
 
 void plaz::AKitchen::refillStock() {
@@ -63,6 +61,14 @@ int plaz::AKitchen::getMultiplier() const {
 
 int plaz::AKitchen::getTimeout() const {
     return this->_timeout;
+}
+
+int plaz::AKitchen::getMaxSlots() const {
+    return this->getMaxCooks() * 2;
+}
+
+void plaz::AKitchen::logMessage(std::string message) {
+    std::cout << "[KITCHEN " << getKitchenId() << "]: " << message << std::endl;
 }
 
 

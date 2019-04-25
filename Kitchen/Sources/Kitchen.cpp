@@ -34,12 +34,14 @@ plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int mu
     plaz::Pizza pizza{};
     PizzaManager pizzaManager;
 
-	std::cout << std::this_thread::get_id() << ": start pizza lel (" << pizzaInt << ")" << std::endl;
+    this->logMessage("Cook starting pizza...");
+	//std::cout << std::this_thread::get_id() << ": start pizza lel (" << pizzaInt << ")" << std::endl;
 	pizza.unpack(pizzaInt);
     pizza.consumePizza(this->getData());
     std::this_thread::sleep_for(std::chrono::seconds(pizzaManager.getTimeOfCooking(pizza.getType()) * this->getMultiplier()));
-    (*this->getData())->availableCooks++;
-    std::cout << std::this_thread::get_id() << ": finish pizza lel (" << pizzaInt << ")" << std::endl;
+    (*this->getData())->availableSlots++;
+    //std::cout << std::this_thread::get_id() << ": finish pizza lel (" << pizzaInt << ")" << std::endl;
+    this->logMessage("Queue finished pizza !");
     this->_queueLog.push("Kitchen " + std::to_string(this->getKitchenId()) + " : " + std::to_string(pizzaInt));
 }), _queueLog("/plazzaLog", plaz::abs::DataQueue<>::Mode::Write), _queueTimeout("/plazzaTimeout", plaz::abs::DataQueue<>::Mode::Write)
 {}
@@ -53,20 +55,20 @@ void plaz::kitchen::Kitchen::runQueueListen() {
             int elapsed_seconds = static_cast<int>(std::chrono::duration_cast<std::chrono::seconds>(
                     std::chrono::system_clock::now() - start).count());
 
-            if ((*this->getData())->availableCooks == this->getMaxCooks() && isworking) {
+            if ((*this->getData())->availableSlots == this->getMaxSlots() && isworking) {
                 start = std::chrono::system_clock::now();
                 isworking = false;
             }
-            if (elapsed_seconds >= 5 && (*this->getData())->availableCooks == this->getMaxCooks() && !isworking) {
+            if (elapsed_seconds >= 5 && (*this->getData())->availableSlots == this->getMaxSlots() && !isworking) {
                 this->_queueTimeout.push(std::to_string(this->getKitchenId()));
                 exit(0);
             }
             if ((*this->getData())->waitingPizza == -1
-                || (*this->getData())->availableCooks <= 0)
+                || (*this->getData())->availableSlots <= 0)
                 continue;
             isworking = true;
-            (*this->getData())->availableCooks--;
-            std::cout << "adding item in queue" << std::endl;
+            (*this->getData())->availableSlots--;
+            this->logMessage("Queue received pizza!");
             _threadPool.queueItem((*this->getData())->waitingPizza);
             (*this->getData())->waitingPizza = -1;
         }

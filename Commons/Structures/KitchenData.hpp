@@ -11,10 +11,8 @@
 #include <atomic>
 
 struct KitchenData {
-    std::atomic_int32_t availableCooks;
+    std::atomic_int32_t availableSlots;
     std::atomic_int32_t waitingPizza;
-    std::atomic_int32_t maxCooks;
-    std::atomic_bool alive;
     std::atomic_int32_t stockDoe;
     std::atomic_int32_t stockTomato;
     std::atomic_int32_t stockGruyere;

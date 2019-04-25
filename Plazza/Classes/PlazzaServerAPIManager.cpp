@@ -20,8 +20,7 @@ namespace plaz::server {
         for (auto &kitchen : runningKitchens) {
             plaz::server::paquet_t paquet = {
                     kitchen->getKitchenId(),
-                    (*kitchen->getData())->maxCooks,
-                    (*kitchen->getData())->availableCooks,
+                    (*kitchen->getData())->availableSlots,
                     (*kitchen->getData())->waitingPizza,
                     (*kitchen->getData())->stockDoe,
                     (*kitchen->getData())->stockTomato,
