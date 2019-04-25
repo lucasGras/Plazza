@@ -33,6 +33,7 @@ public:
 	ThreadPool(std::size_t poolSize, std::size_t queueSize, const Procedure &p)
 		: m_p(p)
 	{
+		(void)queueSize;
 		auto threadProc = [this]()
 		{
 			while (!m_end) {
