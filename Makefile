@@ -25,6 +25,11 @@ $(NAME_KITCHEN):
 	cd build && cmake .. && cd -
 	make -C build $(NAME_KITCHEN) && cp build/$(NAME_KITCHEN) .
 
+tests_run:
+	mkdir -p build
+	cd build && cmake .. && cd -
+	make -C build Tests && cp build/Tests ./units && ./units
+
 clean:
 	rm -rf build/*
 
