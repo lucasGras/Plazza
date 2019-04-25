@@ -77,6 +77,11 @@ namespace plaz::server {
             else if constexpr (std::is_same_v<T, int>)
                 return res;
         }
+        (void)res;
+        if constexpr (std::is_same_v<T, std::string>)
+            return nullptr;
+        else if constexpr (std::is_same_v<T, int>)
+            return 0;
     }
 
     /**
@@ -116,12 +121,10 @@ namespace plaz::server {
     }
 
     void PlazzaServerAPIManager::runApi(plaz::Reception *reception, std::string flag) {
-        if (!flag.empty() && flag != "--no-api" && flag != "--server") {
+        if (!flag.empty() && flag != "--api" && flag != "--server") {
             std::cerr << "Error: invalid argument (" << flag << ")" << std::endl;
             std::exit(84);
         }
-        if (flag == "--no-api")
-            return;
         if (flag == "--server") {
             reception->setServerMode();
             std::thread serverThread([this, reception]() {
@@ -132,7 +135,7 @@ namespace plaz::server {
                 }
             });
             serverThread.detach();
-        } else {
+        } else if (flag == "--api") {
             std::thread apiThread([this, reception]() {
                 while (true) {
                     this->refreshReception(reception->getRunningKitchens());
