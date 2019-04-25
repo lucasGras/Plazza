@@ -68,7 +68,7 @@ plaz::Reception::Reception(const std::string &multiplier, const std::string &coo
         while (true) {
             auto msg = queue.pull();
 
-            std::cout << "LogThread: " << msg << std::endl;
+            std::cout << msg << std::endl;
             this->_logFile << msg + "\n";
         }
     });

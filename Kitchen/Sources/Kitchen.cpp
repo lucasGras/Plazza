@@ -34,13 +34,11 @@ plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int mu
     plaz::Pizza pizza{};
     PizzaManager pizzaManager;
 
-	std::cout << std::this_thread::get_id() << ": start pizza lel (" << pizzaInt << ")" << std::endl;
 	pizza.unpack(pizzaInt);
     pizza.consumePizza(this->getData());
     std::this_thread::sleep_for(std::chrono::seconds(pizzaManager.getTimeOfCooking(pizza.getType()) * this->getMultiplier()));
     (*this->getData())->availableCooks++;
-    std::cout << std::this_thread::get_id() << ": finish pizza lel (" << pizzaInt << ")" << std::endl;
-    this->_queueLog.push("Kitchen " + std::to_string(this->getKitchenId()) + " : " + std::to_string(pizzaInt));
+    this->_queueLog.push("Kitchen " + std::to_string(this->getKitchenId()) + " : finished pizza " + std::to_string(pizzaInt));
 }), _queueLog("/plazzaLog", plaz::abs::DataQueue<>::Mode::Write), _queueTimeout("/plazzaTimeout", plaz::abs::DataQueue<>::Mode::Write)
 {}
 
@@ -66,7 +64,6 @@ void plaz::kitchen::Kitchen::runQueueListen() {
                 continue;
             isworking = true;
             (*this->getData())->availableCooks--;
-            std::cout << "adding item in queue" << std::endl;
             _threadPool.queueItem((*this->getData())->waitingPizza);
             (*this->getData())->waitingPizza = -1;
         }
