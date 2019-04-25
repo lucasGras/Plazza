@@ -121,7 +121,7 @@ namespace plaz::server {
     }
 
     void PlazzaServerAPIManager::runApi(plaz::Reception *reception, std::string flag) {
-        if (!flag.empty() && flag != "--api" && flag != "--server") {
+        if (!flag.empty() && flag != "--enable-api" && flag != "--server") {
             std::cerr << "Error: invalid argument (" << flag << ")" << std::endl;
             std::exit(84);
         }
@@ -135,7 +135,7 @@ namespace plaz::server {
                 }
             });
             serverThread.detach();
-        } else if (flag == "--api") {
+        } else if (flag == "--enable-api") {
             std::thread apiThread([this, reception]() {
                 while (true) {
                     this->refreshReception(reception->getRunningKitchens());
