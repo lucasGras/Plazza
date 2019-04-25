@@ -28,7 +28,8 @@ $(NAME_KITCHEN):
 tests_run:
 	mkdir -p build
 	cd build && cmake .. && cd -
-	make -C build Tests && cp build/Tests ./units && ./units
+	make -C build tests && cp build/tests ./units
+	./units
 
 clean:
 	rm -rf build/*

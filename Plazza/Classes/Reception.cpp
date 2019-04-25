@@ -21,12 +21,6 @@ static inline void rtrim(std::string &s) {
     }).base(), s.end());
 }
 
-static bool is_number(const std::string& s)
-{
-    return !s.empty() && std::find_if(s.begin(),
-            s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
-}
-
 static std::vector<std::string> split(const std::string &s, char delim) {
     std::vector<std::string> result;
     std::stringstream ss(s);
@@ -46,7 +40,6 @@ plaz::Reception::Reception(const std::string &multiplier, const std::string &coo
     this->_multiplier = std::stoi(multiplier);
     this->_cooksNumber = std::stoi(cooks);
     this->_kitchenStockTimeout = std::stoi(kitchen);
-    //this->_mutex = new plaz::abs::Mutex();
     this->_timeoutThread = new plaz::abs::Thread<void>([this]() {
         plaz::abs::DataQueue<> queue("/plazzaTimeout", plaz::abs::DataQueue<>::Mode::Read, true);
         while (true) {

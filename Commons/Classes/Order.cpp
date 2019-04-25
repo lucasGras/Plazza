@@ -12,6 +12,8 @@ namespace plaz {
         this->_valid = this->isValidOrder(order);
         if (this->_valid) {
             this->setPizzaFromOrder(order);
+            if (!this->_pizza.isValid())
+                this->_valid = false;
         } else {
             this->amount = 0;
         }

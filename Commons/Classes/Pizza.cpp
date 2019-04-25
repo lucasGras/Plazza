@@ -12,8 +12,14 @@ plaz::Pizza::Pizza(std::string type, std::string size) {
     std::vector<std::string> typeVector = {"regina", "margarita", "americana", "fantasia"};
     std::vector<std::string> sizeVector = {"S", "M", "L", "XL", "XXL"};
 
+    if (std::find(typeVector.begin(), typeVector.end(), type) == typeVector.end()
+    || std::find(sizeVector.begin(), sizeVector.end(), size) == sizeVector.end()) {
+        this->_valid = false;
+        return;
+    }
     this->_type = static_cast<PizzaType>(1 << std::distance(typeVector.begin(), std::find(typeVector.begin(), typeVector.end(), type)));
     this->_size = static_cast<PizzaSize>(1 << std::distance(sizeVector.begin(), std::find(sizeVector.begin(), sizeVector.end(), size)));
+    this->_valid = true;
 }
 
 /**
@@ -107,4 +113,8 @@ bool plaz::Pizza::checkCanConsumePizza(plaz::abs::SharedData<KitchenData> *data)
             return false;
     }
     return true;
+}
+
+bool plaz::Pizza::isValid() const {
+    return this->_valid;
 }

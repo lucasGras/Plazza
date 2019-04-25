@@ -36,12 +36,14 @@ namespace plaz {
         plaz::Pizza unpack(BitMask bitmask);
         PizzaType getType() const;
         PizzaSize getSize() const;
+        bool isValid() const;
         void consumePizza(plaz::abs::SharedData<KitchenData> *data);
         bool checkCanConsumePizza(plaz::abs::SharedData<KitchenData> *data);
 
     private:
         PizzaType _type;
         PizzaSize _size;
+        bool _valid;
     };
 }
 
