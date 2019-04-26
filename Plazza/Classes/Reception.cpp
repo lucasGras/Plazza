@@ -164,7 +164,7 @@ void plaz::Reception::status() {
         std::cout << "\tEggPlant:" << (*kitchen->getData())->stockEggPlant << std::endl;
         std::cout << "\tGoatCheese:" << (*kitchen->getData())->stockGoatCheese << std::endl;
         std::cout << "\tChiefLove:" << (*kitchen->getData())->stockChiefLove << std::endl;
-        std::cout << "Free chiefs: " << (*kitchen->getData())->availableSlots << " / " << this->_cooksNumber << std::endl;
+        std::cout << "Free slots: " << (*kitchen->getData())->availableSlots << " / " << this->getMaxCooksNumber() * 2 << std::endl;
         std::cout << std::string(str.length(), '-') << std::endl;
     }
 }
