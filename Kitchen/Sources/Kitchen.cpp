@@ -55,10 +55,10 @@ void plaz::kitchen::Kitchen::runQueueListen() {
             int elapsed_seconds = static_cast<int>(std::chrono::duration_cast<std::chrono::seconds>(
                     std::chrono::system_clock::now() - start).count());
 
-            if ((*this->getData())->availableSlots == this->getMaxSlots() && isworking) {
+            if ((*this->getData())->availableSlots == this->getMaxSlots() - 1 && isworking) {
                 start = std::chrono::system_clock::now();
+            } else
                 isworking = false;
-            }
             if (elapsed_seconds >= 5 && (*this->getData())->availableSlots == this->getMaxSlots() && !isworking) {
                 this->_queueTimeout.push(std::to_string(this->getKitchenId()));
                 exit(0);

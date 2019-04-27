@@ -41,8 +41,12 @@ namespace plaz::server {
 
         void refreshReception(std::vector<plaz::AKitchen *>);
         std::vector<plaz::Order> getOrders();
+        int getMaxCooks() const;
 
         void runApi(plaz::Reception *reception, std::string timer);
+
+    private:
+        int _maxReceptionCooks;
     };
 }
 

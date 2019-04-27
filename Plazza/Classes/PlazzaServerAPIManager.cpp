@@ -13,13 +13,14 @@ namespace plaz::server {
      * @param runningKitchens
      * @return
      */
-    static std::vector<plaz::server::paquet_t> getRunningKitchensData(const std::vector<plaz::AKitchen *> runningKitchens) {
+    static std::vector<plaz::server::paquet_t> getRunningKitchensData(const std::vector<plaz::AKitchen *> runningKitchens, int maxCooks) {
         std::vector<plaz::server::paquet_t> runningKitchensData;
 
         runningKitchensData.reserve(runningKitchens.size());
         for (auto &kitchen : runningKitchens) {
             plaz::server::paquet_t paquet = {
                     kitchen->getKitchenId(),
+                    maxCooks,
                     (*kitchen->getData())->availableSlots,
                     (*kitchen->getData())->waitingPizza,
                     (*kitchen->getData())->stockDoe,
@@ -107,7 +108,7 @@ namespace plaz::server {
     }
 
     void PlazzaServerAPIManager::refreshReception(std::vector<plaz::AKitchen *> runningKitchens) {
-        auto runningKitchensData = getRunningKitchensData(runningKitchens);
+        auto runningKitchensData = getRunningKitchensData(runningKitchens, this->getMaxCooks());
         nlohmann::json json = runningKitchensData;
 
         if (makeHttpRequest<int>("http://51.77.211.78:" + std::to_string(PLAZZA_SERVER_PORT) + "/refresh/shared?json=" + json.dump()) != 0)
@@ -125,6 +126,8 @@ namespace plaz::server {
             std::cerr << "Error: invalid argument (" << flag << ")" << std::endl;
             std::exit(84);
         }
+
+        this->_maxReceptionCooks = reception->getMaxCooksNumber() * 2;
         if (flag == "--server") {
             reception->setServerMode();
             std::thread serverThread([this, reception]() {
@@ -144,5 +147,9 @@ namespace plaz::server {
             });
             apiThread.detach();
         }
+    }
+
+    int PlazzaServerAPIManager::getMaxCooks() const {
+        return this->_maxReceptionCooks;
     }
 }
