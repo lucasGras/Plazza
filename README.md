@@ -28,4 +28,5 @@ $> make tests_run
 ## Examples
 
 ![mobileApplication](/resources/demo-mobile-application.jpg)
+
 ![mobileApplication2](/resources/demo-mobile-application-2.jpg)

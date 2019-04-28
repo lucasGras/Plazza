@@ -37,6 +37,7 @@ clean:
 fclean: clean
 	rm -f $(NAME_PLAZZA)
 	rm -f $(NAME_KITCHEN)
+	rm -f units
 
 re: fclean all
 
