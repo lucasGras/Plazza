@@ -16,13 +16,13 @@
 namespace plaz {
 	class AKitchen {
 	public:
-		AKitchen(int kitchenId, int maxCooks, int timeout, int multiplier);
+		AKitchen(int kitchenId, int maxCooks, int timeout, float multiplier);
 		~AKitchen() = default;
 
 		int getKitchenId() const;
 		int getMaxCooks() const;
 		int getMaxSlots() const;
-		int getMultiplier() const;
+		float getMultiplier() const;
 		int getTimeout() const;
 		plaz::abs::SharedData<KitchenData> *getData();
 		plaz::abs::DataQueue<> *getQueue();
@@ -33,7 +33,7 @@ namespace plaz {
 		int _kitchenId;
 		int _maxCooks;
 		int _timeout;
-		int _multiplier;
+		float _multiplier;
 		plaz::abs::SharedData<KitchenData> *_sharedData;
         plaz::abs::DataQueue<> *_queue;
 	};

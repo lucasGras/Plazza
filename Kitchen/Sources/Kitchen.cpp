@@ -19,12 +19,12 @@ int main(int ac, char **av) {
     if (ac != 5)
         return (84);
     // ARGS: ID - MaxCooks - TimeOut - Multiplier
-    plaz::kitchen::Kitchen kitchen(std::atoi(av[1]), std::atoi(av[2]), std::atoi(av[3]), std::atoi(av[4]));
+    plaz::kitchen::Kitchen kitchen(std::atoi(av[1]), std::atoi(av[2]), std::atoi(av[3]), std::atof(av[4]));
     kitchen.runQueueListen();
     while (true);
 }
 
-plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int multiplier)
+plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, float multiplier)
     : AKitchen(kitchenId, maxCooks, timeout, multiplier), _refillStockThread([this]() {
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(this->getTimeout()));
@@ -33,14 +33,14 @@ plaz::kitchen::Kitchen::Kitchen(int kitchenId, int maxCooks, int timeout, int mu
 }), _threadPool(this->getMaxCooks(), (this->getMaxCooks() * 2) - 1, [this](int &pizzaInt) {
     plaz::Pizza pizza{};
     PizzaManager pizzaManager;
+    float sleepTime;
 
     this->logMessage("Cook starting pizza...");
-	//std::cout << std::this_thread::get_id() << ": start pizza lel (" << pizzaInt << ")" << std::endl;
 	pizza.unpack(pizzaInt);
     pizza.consumePizza(this->getData());
-    std::this_thread::sleep_for(std::chrono::seconds(pizzaManager.getTimeOfCooking(pizza.getType()) * this->getMultiplier()));
+    sleepTime = (pizzaManager.getTimeOfCooking(pizza.getType()) * 1000) * this->getMultiplier();
+    std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(sleepTime)));
     (*this->getData())->availableSlots++;
-    //std::cout << std::this_thread::get_id() << ": finish pizza lel (" << pizzaInt << ")" << std::endl;
     this->logMessage("Queue finished pizza !");
     this->_queueLog.push("Kitchen " + std::to_string(this->getKitchenId()) + " : " + std::to_string(pizzaInt));
 }), _queueLog("/plazzaLog", plaz::abs::DataQueue<>::Mode::Write), _queueTimeout("/plazzaTimeout", plaz::abs::DataQueue<>::Mode::Write)

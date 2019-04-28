@@ -59,8 +59,8 @@ namespace plaz {
                 { Fantasia, { Doe, Tomato, Eggplant, GoatCheese, ChiefLove } }
         };
         std::map<PizzaType, int> _timesOfPizza = {
-                { Regina, 1 },
-                { Margarita, 2 },
+                { Margarita, 1 },
+                { Regina, 2 },
                 { Americana, 2 },
                 { Fantasia, 4 },
         };

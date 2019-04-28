@@ -7,7 +7,7 @@
 
 #include "AKitchen.hpp"
 
-plaz::AKitchen::AKitchen(int kitchenId, int maxCooks, int timeout, int multiplier)
+plaz::AKitchen::AKitchen(int kitchenId, int maxCooks, int timeout, float multiplier)
         : _kitchenId(kitchenId), _maxCooks(maxCooks), _timeout(timeout), _multiplier(multiplier) {
     this->_sharedData = new plaz::abs::SharedData<KitchenData>("/kitchen_data_" + std::to_string(this->getKitchenId()), O_CREAT | O_RDWR);
     //this->_queue = new plaz::abs::DataQueue("/kitchen_msg_" + std::to_string(this->getKitchenId()), O_CREAT | O_RDWR);
@@ -55,7 +55,7 @@ void plaz::AKitchen::refillStock() {
     (*this->getData())->stockChiefLove += 1;
 }
 
-int plaz::AKitchen::getMultiplier() const {
+float plaz::AKitchen::getMultiplier() const {
     return this->_multiplier;
 }
 

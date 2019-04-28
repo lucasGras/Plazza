@@ -37,14 +37,14 @@ namespace plaz {
         void serverModeReception();
         void setServerMode();
 
-        int getMultiplier();
+        float getMultiplier();
         int getMaxCooksNumber();
         int getKitchenStockTimeout();
         std::vector<plaz::AKitchen *> getRunningKitchens() const;
         bool isServerMode();
 
     private:
-        int _multiplier;
+        float _multiplier;
         int _cooksNumber;
         int _kitchenStockTimeout;
         std::map<plaz::AKitchen*, plaz::abs::Process*> _kitchens;

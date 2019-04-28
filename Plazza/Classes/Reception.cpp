@@ -37,7 +37,7 @@ static std::vector<std::string> split(const std::string &s, char delim) {
 plaz::Reception::Reception(const std::string &multiplier, const std::string &cooks, const std::string &kitchen)
     : _logFile("plazza-log.txt", std::ios_base::app)
 {
-    this->_multiplier = std::stoi(multiplier);
+    this->_multiplier = std::stof(multiplier);
     this->_cooksNumber = std::stoi(cooks);
     this->_kitchenStockTimeout = std::stoi(kitchen);
     this->_timeoutThread = new plaz::abs::Thread<void>([this]() {
@@ -136,7 +136,7 @@ plaz::AKitchen *plaz::Reception::initNewKitchen() {
     return (kitchen);
 }
 
-int plaz::Reception::getMultiplier() {
+float plaz::Reception::getMultiplier() {
     return this->_multiplier;
 }
 
